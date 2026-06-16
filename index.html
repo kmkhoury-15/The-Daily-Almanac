@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Daily Almanac — weather, records &amp; the long view</title>
+<meta name="description" content="The Daily Almanac: today's weather set against the record book. Compare days and cities, read the rainfall ledger, and watch the long temperature record." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --night:#0C1726;
+    --night-2:#102134;
+    --night-3:#19324A;
+    --line:#274058;
+    --parchment:#EDE4CF;
+    --muted:#90A6BD;
+    --muted-2:#6E869E;
+    --brass:#D2A24C;
+    --brass-soft:#E6C786;
+    --ember:#C75D3C;
+    --frost:#74C0D4;
+    --frost-deep:#3E8FA8;
+    --good:#7FB069;
+    --shadow:0 18px 50px -28px rgba(0,0,0,.85);
+    --r:14px;
+    --display:"Fraunces",Georgia,serif;
+    --sans:"IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    font-family:var(--sans);
+    color:var(--parchment);
+    background:
+      radial-gradient(1.4px 1.4px at 18% 22%, rgba(237,228,207,.55), transparent 60%),
+      radial-gradient(1.1px 1.1px at 73% 14%, rgba(237,228,207,.45), transparent 60%),
+      radial-gradient(1.3px 1.3px at 42% 9%, rgba(237,228,207,.4), transparent 60%),
+      radial-gradient(1px 1px at 88% 34%, rgba(237,228,207,.4), transparent 60%),
+      radial-gradient(1.2px 1.2px at 30% 48%, rgba(237,228,207,.3), transparent 60%),
+      radial-gradient(1px 1px at 62% 60%, rgba(237,228,207,.3), transparent 60%),
+      radial-gradient(1100px 700px at 78% -8%, rgba(210,162,76,.10), transparent 60%),
+      radial-gradient(900px 600px at 8% 4%, rgba(116,192,212,.08), transparent 60%),
+      linear-gradient(180deg,#0A1320 0%, var(--night) 38%, #0A1422 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--brass-soft)}
+  ::selection{background:rgba(210,162,76,.3)}
+
+  .wrap{max-width:1140px;margin:0 auto;padding:26px 20px 80px}
+
+  /* ---------- Masthead ---------- */
+  .masthead{position:relative;text-align:center;padding:10px 0 18px}
+  .rule{height:0;border:0;border-top:1px solid var(--line);position:relative}
+  .rule.double{border-top:2px solid var(--brass);box-shadow:0 4px 0 -3px var(--brass)}
+  .rule .pip{position:absolute;left:50%;top:-7px;width:13px;height:13px;transform:translateX(-50%) rotate(45deg);
+    background:var(--night);border:2px solid var(--brass)}
+  .kicker{font-family:var(--mono);letter-spacing:.42em;text-transform:uppercase;font-size:.62rem;color:var(--brass);margin:14px 0 6px}
+  h1.title{
+    font-family:var(--display);font-weight:900;
+    font-size:clamp(2.5rem,8vw,5rem);line-height:.92;letter-spacing:-.01em;margin:0;
+    color:var(--parchment);
+    text-shadow:0 1px 0 rgba(0,0,0,.4);
+  }
+  h1.title .amp{font-style:italic;font-weight:500;color:var(--brass)}
+  .dateline{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.06em;margin:12px 0 0;min-height:1.1em}
+  .dateline .loc{color:var(--parchment)}
+
+  /* ---------- Console (search / controls) ---------- */
+  .console{margin:20px auto 8px;max-width:760px}
+  .searchrow{display:flex;gap:8px;align-items:stretch}
+  .field{position:relative;flex:1}
+  .field svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted);pointer-events:none}
+  input[type=text]{
+    width:100%;background:var(--night-2);border:1px solid var(--line);color:var(--parchment);
+    border-radius:11px;padding:13px 14px 13px 38px;font-family:var(--sans);font-size:.98rem;outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input[type=text]::placeholder{color:var(--muted-2)}
+  input[type=text]:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(210,162,76,.16)}
+  .btn{
+    background:var(--brass);color:#1A1206;border:1px solid var(--brass);
+    font-family:var(--sans);font-weight:600;font-size:.92rem;padding:0 18px;border-radius:11px;cursor:pointer;
+    transition:transform .08s, filter .15s;white-space:nowrap;
+  }
+  .btn:hover{filter:brightness(1.06)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent;color:var(--parchment);border-color:var(--line)}
+  .btn.ghost:hover{border-color:var(--brass);color:var(--brass-soft);filter:none}
+  .btn[aria-pressed=true]{background:var(--night-3);color:var(--brass-soft);border-color:var(--brass)}
+
+  .meta{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;justify-content:center;margin-top:12px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--night-2)}
+  .seg button{background:transparent;border:0;color:var(--muted);font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;
+    padding:8px 12px;cursor:pointer;transition:background .15s,color .15s}
+  .seg button[aria-pressed=true]{background:var(--brass);color:#1A1206}
+  .selectwrap{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.05em}
+  select{background:var(--night-2);color:var(--parchment);border:1px solid var(--line);border-radius:9px;
+    padding:7px 9px;font-family:var(--mono);font-size:.74rem;cursor:pointer;outline:none}
+  select:focus{border-color:var(--brass)}
+
+  /* suggestions */
+  .suggest{position:relative;max-width:760px;margin:0 auto}
+  .suggest ul{list-style:none;margin:6px 0 0;padding:6px;position:absolute;left:0;right:0;z-index:30;
+    background:#0E2034;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+  .suggest li{padding:10px 12px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;gap:12px}
+  .suggest li:hover,.suggest li[aria-selected=true]{background:var(--night-3)}
+  .suggest li .nm{font-weight:500}
+  .suggest li .co{color:var(--muted);font-family:var(--mono);font-size:.74rem;align-self:center}
+
+  /* status */
+  .status{max-width:760px;margin:14px auto 0;min-height:0}
+  .banner{border:1px solid var(--line);border-left:3px solid var(--brass);background:var(--night-2);
+    border-radius:10px;padding:12px 14px;font-size:.9rem;color:var(--muted);display:flex;gap:10px;align-items:center}
+  .banner.err{border-left-color:var(--ember);color:#E7C3B5}
+  .spin{width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--brass);border-radius:50%;
+    animation:spin .8s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- Layout grid ---------- */
+  .grid{display:grid;gap:16px;margin-top:24px}
+  .row{display:grid;gap:16px}
+  .r-hero{grid-template-columns:1.15fr .85fr}
+  .r-2{grid-template-columns:1fr 1fr}
+  @media(max-width:860px){.r-hero,.r-2{grid-template-columns:1fr}}
+
+  .panel{background:linear-gradient(180deg,var(--night-2),#0D1B2B);border:1px solid var(--line);
+    border-radius:var(--r);padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .panel::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(420px 160px at 100% 0,rgba(210,162,76,.06),transparent 60%)}
+  .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:.24em;font-size:.62rem;color:var(--brass);
+    display:flex;align-items:center;gap:8px;margin:0 0 12px}
+  .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  .panel h2{font-family:var(--display);font-weight:600;font-size:1.2rem;margin:.1em 0 .2em}
+  .note{font-size:.74rem;color:var(--muted-2);font-family:var(--mono);letter-spacing:.02em}
+
+  /* ---------- Current conditions ---------- */
+  .now{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+  .now .bigtemp{font-family:var(--display);font-weight:900;font-size:clamp(3.4rem,11vw,5.2rem);line-height:.85;letter-spacing:-.02em}
+  .now .deg{color:var(--brass)}
+  .now .summary{flex:1;min-width:170px}
+  .now .cond{font-family:var(--display);font-size:1.15rem;font-weight:500;font-style:italic;color:var(--brass-soft)}
+  .now .feels{color:var(--muted);font-size:.86rem;margin-top:2px}
+  .now .glyph{width:74px;height:74px;color:var(--brass);flex:none}
+
+  .gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+  @media(max-width:540px){.gauges{grid-template-columns:repeat(2,1fr)}}
+  .gauge{background:#0B1A2A;border:1px solid var(--line);border-radius:11px;padding:11px 10px;text-align:center}
+  .gauge .lab{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted-2)}
+  .gauge .val{font-family:var(--mono);font-weight:600;font-size:1.12rem;margin-top:3px}
+  .gauge .sub{font-size:.66rem;color:var(--muted);font-family:var(--mono);margin-top:1px;min-height:.8em}
+  .gauge svg.dial{width:100%;height:42px;display:block;margin-top:6px}
+
+  /* ---------- Sky dome ---------- */
+  .dome-wrap{text-align:center}
+  svg.dome{width:100%;height:auto;display:block}
+  .dome-times{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mono)}
+  .dome-times .t .k{font-size:.58rem;letter-spacing:.14em;color:var(--muted-2);text-transform:uppercase}
+  .dome-times .t .v{font-size:1rem;color:var(--parchment)}
+  .dome-times .t.rise .v{color:var(--brass)}
+  .dome-times .t.set .v{color:var(--frost)}
+  .daylen{font-family:var(--mono);font-size:.74rem;color:var(--muted);margin-top:2px}
+
+  /* ---------- Charts ---------- */
+  svg.chart{width:100%;height:auto;display:block;font-family:var(--mono)}
+  .axis text{fill:var(--muted-2);font-size:10px}
+  .axis line{stroke:var(--line)}
+  .glabel{fill:var(--muted);font-size:10.5px;letter-spacing:.02em}
+  .barval{fill:var(--parchment);font-size:11px;font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .swatch.line{width:16px;height:0;border-top:2px solid;border-radius:0}
+
+  /* bar grow + line draw animations */
+  @media (prefers-reduced-motion: no-preference){
+    .bar{transform-box:fill-box;transform-origin:bottom;animation:grow .85s cubic-bezier(.2,.85,.25,1) both}
+    .spark{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.5s ease forwards .15s}
+    .sun-anim{animation:rise 1.2s cubic-bezier(.2,.8,.2,1) both}
+    .twinkle{animation:tw 3.2s ease-in-out infinite}
+  }
+  @keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes tw{0%,100%{opacity:.25}50%{opacity:.9}}
+
+  /* ---------- Ledger (rainfall) ---------- */
+  .ledger{display:grid;gap:12px;margin-top:6px}
+  .ledger .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:520px){.ledger .row3{grid-template-columns:1fr}}
+  .drop{background:#0B1A2A;border:1px solid var(--line);border-radius:11px;padding:12px;text-align:center}
+  .drop .lab{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2)}
+  .drop .amt{font-family:var(--display);font-weight:900;font-size:1.7rem;color:var(--frost);margin-top:3px;line-height:1}
+  .drop .amt small{font-size:.7rem;font-family:var(--mono);font-weight:500;color:var(--muted);margin-left:3px}
+  .drop .norm{font-family:var(--mono);font-size:.66rem;color:var(--muted);margin-top:5px}
+  .drop .norm b{color:var(--brass-soft);font-weight:600}
+
+  /* ---------- This day in history ---------- */
+  .hist{display:grid;gap:10px;margin-top:4px}
+  .hist .item{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    border-bottom:1px dashed var(--line);padding-bottom:9px}
+  .hist .item:last-child{border-bottom:0}
+  .hist .item .k{font-size:.84rem;color:var(--muted)}
+  .hist .item .k b{color:var(--parchment);font-weight:500}
+  .hist .item .v{font-family:var(--mono);font-weight:600;font-size:1.05rem;text-align:right;white-space:nowrap}
+  .hist .item.hi .v{color:var(--ember)}
+  .hist .item.lo .v{color:var(--frost)}
+  .hist .item.wet .v{color:var(--frost-deep)}
+  .hist .yr{font-family:var(--mono);font-size:.68rem;color:var(--muted-2);display:block;font-weight:400}
+
+  /* ---------- Head to head ---------- */
+  .h2h table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.86rem}
+  .h2h th,.h2h td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right}
+  .h2h th:first-child,.h2h td:first-child{text-align:left;color:var(--muted)}
+  .h2h thead th{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brass);border-bottom-color:var(--brass)}
+  .h2h td.win{color:var(--brass-soft);font-weight:600}
+  .h2h .cityA{color:var(--brass)}
+  .h2h .cityB{color:var(--frost)}
+
+  /* ---------- Upload panel ---------- */
+  .uploader{margin:14px auto 0;max-width:760px}
+  details.up{background:var(--night-2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  details.up summary{cursor:pointer;list-style:none;padding:12px 14px;font-family:var(--mono);font-size:.78rem;
+    color:var(--brass);letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+  details.up summary::-webkit-details-marker{display:none}
+  details.up summary::before{content:"＋";font-weight:600}
+  details.up[open] summary::before{content:"−"}
+  .up .body{padding:0 14px 14px;font-size:.86rem;color:var(--muted)}
+  .up code{font-family:var(--mono);background:#0B1A2A;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:.8rem;color:var(--brass-soft)}
+  .up pre{background:#0B1A2A;border:1px solid var(--line);border-radius:9px;padding:11px;overflow:auto;
+    font-family:var(--mono);font-size:.74rem;color:var(--parchment);line-height:1.45}
+  .up .file{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  input[type=file]{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+  input[type=file]::file-selector-button{background:var(--night-3);color:var(--brass-soft);border:1px solid var(--line);
+    border-radius:8px;padding:8px 12px;font-family:var(--sans);font-size:.82rem;cursor:pointer;margin-right:10px}
+
+  footer{margin-top:46px;text-align:center;font-family:var(--mono);font-size:.72rem;color:var(--muted-2);line-height:1.7}
+  footer .rule{margin-bottom:18px}
+
+  .hidden{display:none !important}
+  .skeleton{color:var(--muted-2)}
+  :focus-visible{outline:2px solid var(--brass);outline-offset:2px;border-radius:4px}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <!-- ===== Masthead ===== -->
+  <header class="masthead">
+    <hr class="rule double" aria-hidden="true"><span class="pip" aria-hidden="true"></span>
+    <div class="kicker">Vol. MMXXVI · Weather &amp; Record</div>
+    <h1 class="title">The Daily <span class="amp">&amp;</span> Almanac</h1>
+    <p class="dateline" id="dateline">Today against the record book — choose a place to begin.</p>
+    <hr class="rule" aria-hidden="true" style="margin-top:16px">
+  </header>
+
+  <!-- ===== Console ===== -->
+  <section class="console" aria-label="Controls">
+    <div class="searchrow">
+      <div class="field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="cityInput" autocomplete="off" placeholder="Search a city — e.g. Phoenix, Reykjavík, Nairobi" aria-label="Search for a city" />
+      </div>
+      <button class="btn" id="searchBtn">Read the day</button>
+    </div>
+    <div class="suggest"><ul id="suggest" class="hidden" role="listbox" aria-label="City matches"></ul></div>
+
+    <div class="meta">
+      <div class="seg" role="group" aria-label="Units">
+        <button id="unitUS" aria-pressed="true">°F · in · mph</button>
+        <button id="unitSI" aria-pressed="false">°C · mm · km/h</button>
+      </div>
+      <span class="selectwrap">Records since
+        <select id="sinceSel" aria-label="Earliest year for records and trend">
+          <option value="1960" selected>1960</option>
+          <option value="1950">1950</option>
+          <option value="1980">1980</option>
+          <option value="2000">2000</option>
+        </select>
+      </span>
+      <button class="btn ghost" id="compareBtn" aria-pressed="false">＋ Compare a city</button>
+    </div>
+
+    <div id="compareWrap" class="searchrow hidden" style="margin-top:10px">
+      <div class="field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="cityInputB" autocomplete="off" placeholder="Second city to compare against" aria-label="Search for a second city" />
+      </div>
+      <button class="btn ghost" id="searchBtnB">Add</button>
+    </div>
+    <div class="suggest"><ul id="suggestB" class="hidden" role="listbox" aria-label="Comparison city matches"></ul></div>
+
+    <div class="uploader">
+      <details class="up">
+        <summary>Use your own records instead</summary>
+        <div class="body">
+          <p>Have a station log or historical export? Upload a <b>JSON</b> or <b>CSV</b> file and the almanac will rebuild every plate from your numbers — no network needed.</p>
+          <p><b>CSV</b> — one row per day, header required. Values read as metric (°C, mm):</p>
+          <pre>date,tmax,tmin,precip
+2026-06-15,41.2,27.8,0.0
+2026-06-16,42.1,28.4,0.0</pre>
+          <p><b>JSON</b> — daily series plus optional live readings and explicit units:</p>
+          <pre>{
+  "place": "My Backyard Station",
+  "units": { "temp":"C", "precip":"mm", "wind":"kmh", "pressure":"hPa" },
+  "current": { "temp":41.8, "dew_point":7.2, "humidity":14,
+               "wind_speed":11, "wind_direction":250, "pressure":1009, "weather_code":0 },
+  "daily": [ {"date":"2026-06-16","tmax":42.1,"tmin":28.4,"precip":0.0} ]
+}</pre>
+          <div class="file">
+            <input type="file" id="fileInput" accept=".json,.csv,.txt,application/json,text/csv" />
+            <button class="btn ghost" id="clearUpload">Back to live data</button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </section>
+
+  <!-- ===== Dashboard ===== -->
+  <div id="dash" class="grid hidden">
+
+    <div class="row r-hero">
+      <section class="panel" id="nowPanel" aria-labelledby="nowH">
+        <p class="eyebrow">Current conditions</p>
+        <h2 id="nowH" class="skeleton">—</h2>
+        <div class="now" id="nowBody"></div>
+        <div class="gauges" id="gauges"></div>
+      </section>
+
+      <section class="panel dome-wrap" aria-labelledby="domeH">
+        <p class="eyebrow">The sun's passage</p>
+        <h2 id="domeH" style="margin-bottom:10px">Sky dome</h2>
+        <div id="domeBody"></div>
+      </section>
+    </div>
+
+    <section class="panel" aria-labelledby="tempH">
+      <p class="eyebrow">Yesterday · Today · Record</p>
+      <h2 id="tempH">The thermometer, in context</h2>
+      <div id="tempChart"></div>
+      <div class="legend" id="tempLegend"></div>
+    </section>
+
+    <div class="row r-2">
+      <section class="panel" aria-labelledby="rainH">
+        <p class="eyebrow">The rainfall ledger</p>
+        <h2 id="rainH">What the sky has given</h2>
+        <div class="ledger" id="rainLedger"></div>
+        <div id="rainNote" class="note" style="margin-top:12px"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="histH">
+        <p class="eyebrow">This day in history</p>
+        <h2 id="histH">On this date, across the years</h2>
+        <div class="hist" id="histBody"></div>
+        <p class="note" id="histNote" style="margin-top:12px"></p>
+      </section>
+    </div>
+
+    <section class="panel hidden" id="h2hPanel" aria-labelledby="h2hH">
+      <p class="eyebrow">Head to head</p>
+      <h2 id="h2hH">Two cities, side by side</h2>
+      <div class="h2h" id="h2hBody"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="longH">
+      <p class="eyebrow">The long record</p>
+      <h2 id="longH">Annual mean temperature</h2>
+      <div id="longChart"></div>
+      <div class="legend" id="longLegend"></div>
+      <p class="note" id="longNote" style="margin-top:10px"></p>
+    </section>
+
+  </div>
+
+  <footer>
+    <hr class="rule" aria-hidden="true">
+    The Daily Almanac · live weather &amp; archive from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (no key required).<br>
+    Records and normals are computed from the available reanalysis archive and are not official station extremes — consult your national weather service for verified records.
+  </footer>
+</main>
+
+<script>
+"use strict";
+(function(){
+  /* ============================================================
+     The Daily Almanac — client-side weather + historical almanac
+     Canonical internal units: °C, mm, km/h, hPa. Convert at render.
+  ============================================================ */
+
+  // ---------- Endpoints ----------
+  const GEO   = "https://geocoding-api.open-meteo.com/v1/search";
+  const FCAST = "https://api.open-meteo.com/v1/forecast";
+  const ARCH  = "https://archive-api.open-meteo.com/v1/archive";
+
+  // ---------- State ----------
+  const state = {
+    units: "us",        // "us" | "si"
+    since: 1960,
+    compare: false,
+    A: null,            // model for primary city
+    B: null,            // model for comparison city
+    placeA: null,       // last primary place object (for refetch without storage)
+    placeB: null,       // last comparison place object
+    uploaded: null,     // model from file (overrides A)
+  };
+
+  // ---------- DOM ----------
+  const $ = (id) => document.getElementById(id);
+  const dash = $("dash"), statusEl = $("status"), dateline = $("dateline");
+
+  // ---------- Persistence (graceful) ----------
+  const store = {
+    get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  };
+
+  // ---------- Conversions & formatting ----------
+  const cToF = c => c*9/5+32;
+  const round = (n,d=0)=>{ const p=10**d; return Math.round(n*p)/p; };
+  const compass = deg => ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"][Math.round(((deg%360)/22.5))%16];
+
+  function fTemp(c, withUnit){
+    if(c==null||isNaN(c)) return "—";
+    const v = state.units==="us" ? cToF(c) : c;
+    return round(v) + (withUnit ? "°" : "°");
+  }
+  function tempUnitLabel(){ return state.units==="us" ? "°F" : "°C"; }
+  function tempNum(c){ if(c==null||isNaN(c)) return null; return state.units==="us"?cToF(c):c; }
+  function fPrecip(mm){
+    if(mm==null||isNaN(mm)) return "—";
+    return state.units==="us" ? (mm/25.4).toFixed(2) : (mm<10?mm.toFixed(1):Math.round(mm).toString());
+  }
+  function precipUnit(){ return state.units==="us" ? "in" : "mm"; }
+  function precipNum(mm){ if(mm==null||isNaN(mm)) return 0; return state.units==="us"?mm/25.4:mm; }
+  function fWind(kmh){
+    if(kmh==null||isNaN(kmh)) return "—";
+    return state.units==="us" ? Math.round(kmh/1.609344).toString() : Math.round(kmh).toString();
+  }
+  function windUnit(){ return state.units==="us"?"mph":"km/h"; }
+  function fPressure(hPa){
+    if(hPa==null||isNaN(hPa)) return "—";
+    return state.units==="us" ? (hPa*0.0295299830714).toFixed(2) : Math.round(hPa).toString();
+  }
+  function pressureUnit(){ return state.units==="us"?"inHg":"hPa"; }
+
+  function fmtTime(iso, tz){
+    if(!iso) return "—";
+    try{
+      const d = new Date(iso);
+      return d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit", timeZone: tz});
+    }catch(e){
+      return iso.slice(11,16);
+    }
+  }
+  function dateAddDays(iso, n){
+    const d = new Date(iso+"T00:00:00Z"); d.setUTCDate(d.getUTCDate()+n);
+    return d.toISOString().slice(0,10);
+  }
+  function prettyDate(iso, tz){
+    try{ return new Date(iso+"T12:00:00").toLocaleDateString([], {weekday:"long",year:"numeric",month:"long",day:"numeric",timeZone:tz}); }
+    catch(e){ return iso; }
+  }
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  // ---------- Weather code → label + glyph ----------
+  function weatherInfo(code){
+    const c = Number(code);
+    if(c===0) return {label:"Clear sky", icon:"sun"};
+    if(c===1) return {label:"Mainly clear", icon:"sun"};
+    if(c===2) return {label:"Partly cloudy", icon:"partly"};
+    if(c===3) return {label:"Overcast", icon:"cloud"};
+    if(c===45||c===48) return {label:"Fog", icon:"fog"};
+    if(c>=51&&c<=57) return {label:"Drizzle", icon:"rain"};
+    if(c>=61&&c<=67) return {label:"Rain", icon:"rain"};
+    if(c>=71&&c<=77) return {label:"Snow", icon:"snow"};
+    if(c>=80&&c<=82) return {label:"Rain showers", icon:"rain"};
+    if(c===85||c===86) return {label:"Snow showers", icon:"snow"};
+    if(c>=95) return {label:"Thunderstorm", icon:"thunder"};
+    return {label:"—", icon:"cloud"};
+  }
+  function glyph(name, size){
+    const s = size||74, S='stroke="currentColor" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
+    const head = `<svg viewBox="0 0 48 48" width="${s}" height="${s}" class="glyph" aria-hidden="true">`;
+    const sun = `<circle cx="24" cy="24" r="8" ${S}/>`+
+      [...Array(8)].map((_,i)=>{const a=i*Math.PI/4,x1=24+Math.cos(a)*13,y1=24+Math.sin(a)*13,x2=24+Math.cos(a)*17,y2=24+Math.sin(a)*17;return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" ${S}/>`;}).join("");
+    const cloud = `<path d="M14 32a7 7 0 0 1 1-13 9 9 0 0 1 17 2 6 6 0 0 1-1 11Z" ${S}/>`;
+    const map = {
+      sun: head+sun+`</svg>`,
+      partly: head+`<circle cx="18" cy="18" r="6" ${S}/>`+`<path d="M16 34a6 6 0 0 1 1-11 8 8 0 0 1 15 2 5 5 0 0 1-1 9Z" ${S}/></svg>`,
+      cloud: head+cloud+`</svg>`,
+      fog: head+cloud+`<line x1="12" y1="38" x2="34" y2="38" ${S}/><line x1="16" y1="42" x2="30" y2="42" ${S}/></svg>`,
+      rain: head+cloud+`<line x1="18" y1="36" x2="16" y2="42" ${S}/><line x1="24" y1="36" x2="22" y2="42" ${S}/><line x1="30" y1="36" x2="28" y2="42" ${S}/></svg>`,
+      snow: head+cloud+`<circle cx="18" cy="39" r="1.2" fill="currentColor" stroke="none"/><circle cx="24" cy="41" r="1.2" fill="currentColor" stroke="none"/><circle cx="30" cy="39" r="1.2" fill="currentColor" stroke="none"/></svg>`,
+      thunder: head+cloud+`<path d="M24 35l-4 6h4l-3 5" ${S}/></svg>`,
+    };
+    return map[name]||map.cloud;
+  }
+
+  // ---------- Networking ----------
+  async function getJSON(url){
+    const res = await fetch(url, {headers:{Accept:"application/json"}});
+    if(!res.ok) throw new Error("Request failed ("+res.status+")");
+    return res.json();
+  }
+  async function geocode(q){
+    const url = `${GEO}?name=${encodeURIComponent(q)}&count=6&language=en&format=json`;
+    const data = await getJSON(url);
+    return data.results || [];
+  }
+
+  function todayUTC(){ return new Date().toISOString().slice(0,10); }
+
+  async function fetchCity(place){
+    const lat = place.latitude, lon = place.longitude;
+    const fUrl = `${FCAST}?latitude=${lat}&longitude=${lon}`+
+      `&current=temperature_2m,relative_humidity_2m,apparent_temperature,dew_point_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,weather_code,precipitation`+
+      `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset,weather_code`+
+      `&past_days=10&forecast_days=2&timezone=auto`;
+    const archEnd = dateAddDays(todayUTC(), -6);
+    const aUrl = `${ARCH}?latitude=${lat}&longitude=${lon}`+
+      `&start_date=${state.since}-01-01&end_date=${archEnd}`+
+      `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
+    const [forecast, archive] = await Promise.all([getJSON(fUrl), getJSON(aUrl)]);
+    return buildModelFromAPI(place, forecast, archive);
+  }
+
+  // ---------- Model builder (live API) ----------
+  function buildModelFromAPI(place, forecast, archive){
+    const tz = forecast.timezone || place.timezone || "UTC";
+    const cur = forecast.current || {};
+    const D = forecast.daily || {};
+    const dt = D.time || [];
+    const todayDate = (cur.time || todayUTC()+"T00:00").slice(0,10);
+    const yestDate = dateAddDays(todayDate, -1);
+    const iToday = dt.indexOf(todayDate);
+    const iYest  = dt.indexOf(yestDate);
+    const at = (arr,i)=> (arr && i>=0 && i<arr.length) ? arr[i] : null;
+
+    const model = {
+      place: place.label || place.name,
+      tz,
+      today: {
+        date: todayDate,
+        hi: at(D.temperature_2m_max, iToday),
+        lo: at(D.temperature_2m_min, iToday),
+        precip: at(D.precipitation_sum, iToday),
+        sunrise: at(D.sunrise, iToday),
+        sunset: at(D.sunset, iToday),
+        code: at(D.weather_code, iToday),
+      },
+      yesterday: {
+        date: yestDate,
+        hi: at(D.temperature_2m_max, iYest),
+        lo: at(D.temperature_2m_min, iYest),
+        precip: at(D.precipitation_sum, iYest),
+        code: at(D.weather_code, iYest),
+      },
+      current: {
+        temp: cur.temperature_2m,
+        apparent: cur.apparent_temperature,
+        dew: cur.dew_point_2m,
+        humidity: cur.relative_humidity_2m,
+        windSpeed: cur.wind_speed_10m,
+        windGust: cur.wind_gusts_10m,
+        windDir: cur.wind_direction_10m,
+        pressure: cur.surface_pressure,
+        code: cur.weather_code,
+        time: cur.time,
+      },
+    };
+
+    // Daily precip map for current year: archive then override with forecast (recent days authoritative)
+    const yearStr = todayDate.slice(0,4);
+    const precipMap = {};
+    const aT = archive.daily?.time || [], aP = archive.daily?.precipitation_sum || [];
+    for(let i=0;i<aT.length;i++){ if(aT[i].slice(0,4)===yearStr && aP[i]!=null) precipMap[aT[i]] = aP[i]; }
+    for(let i=0;i<dt.length;i++){ const d=dt[i]; if(d.slice(0,4)===yearStr){ const v=at(D.precipitation_sum,i); if(v!=null) precipMap[d]=v; } }
+
+    model.precipLedger = computeLedger(precipMap, todayDate, archive);
+    model.records = computeRecords(archive, todayDate);
+    model.annual = computeAnnual(archive);
+    return model;
+  }
+
+  function computeLedger(precipMap, todayDate, archive){
+    const ym = todayDate.slice(0,7), yr = todayDate.slice(0,4);
+    let ytd=0, mtd=0;
+    for(const d in precipMap){
+      if(d<=todayDate && d.slice(0,4)===yr) ytd += precipMap[d];
+      if(d<=todayDate && d.slice(0,7)===ym) mtd += precipMap[d];
+    }
+    const yest = precipMap[dateAddDays(todayDate,-1)];
+    // Normals from archive: average cumulative-to-this-date across complete prior years
+    const mmdd = todayDate.slice(5);
+    const aT = archive.daily?.time || [], aP = archive.daily?.precipitation_sum || [];
+    const ytdByYear = {}, mtdByYear = {}, monPrefix = todayDate.slice(5,7);
+    for(let i=0;i<aT.length;i++){
+      const d=aT[i], y=d.slice(0,4), md=d.slice(5), v=aP[i];
+      if(v==null) continue;
+      if(md<=mmdd){ ytdByYear[y]=(ytdByYear[y]||0)+v; }
+      if(md<=mmdd && d.slice(5,7)===monPrefix){ mtdByYear[y]=(mtdByYear[y]||0)+v; }
+    }
+    delete ytdByYear[yr]; delete mtdByYear[yr];
+    const mean = obj => { const v=Object.values(obj); return v.length? v.reduce((a,b)=>a+b,0)/v.length : null; };
+    return {
+      yesterday: yest==null?null:yest,
+      monthToDate: mtd, yearToDate: ytd,
+      normalMTD: mean(mtdByYear), normalYTD: mean(ytdByYear),
+      monthName: MONTHS[+todayDate.slice(5,7)-1], year: yr,
+      sampleYears: Object.keys(ytdByYear).length,
+    };
+  }
+
+  function computeRecords(archive, todayDate){
+    const mmdd = todayDate.slice(5);
+    const aT = archive.daily?.time || [], aMx = archive.daily?.temperature_2m_max || [],
+          aMn = archive.daily?.temperature_2m_min || [], aP = archive.daily?.precipitation_sum || [];
+    let hi=-Infinity,hiY=null, lo=Infinity,loY=null, wet=-Infinity,wetY=null, n=0;
+    let startY=null, endY=null;
+    for(let i=0;i<aT.length;i++){
+      const d=aT[i]; const y=+d.slice(0,4);
+      if(startY==null||y<startY)startY=y; if(endY==null||y>endY)endY=y;
+      if(d.slice(5)!==mmdd) continue;
+      n++;
+      if(aMx[i]!=null && aMx[i]>hi){hi=aMx[i];hiY=y;}
+      if(aMn[i]!=null && aMn[i]<lo){lo=aMn[i];loY=y;}
+      if(aP[i]!=null && aP[i]>wet){wet=aP[i];wetY=y;}
+    }
+    return {
+      hi: isFinite(hi)?hi:null, hiYear:hiY,
+      lo: isFinite(lo)?lo:null, loYear:loY,
+      wet: isFinite(wet)?wet:null, wetYear:wetY,
+      samples:n, startYear:startY, endYear:endY,
+    };
+  }
+
+  function computeAnnual(archive){
+    const aT = archive.daily?.time || [], aMx = archive.daily?.temperature_2m_max || [], aMn = archive.daily?.temperature_2m_min || [];
+    const acc = {}; // year -> {sum,count}
+    for(let i=0;i<aT.length;i++){
+      const y=aT[i].slice(0,4);
+      if(aMx[i]==null||aMn[i]==null) continue;
+      const m=(aMx[i]+aMn[i])/2;
+      (acc[y]=acc[y]||{sum:0,n:0}); acc[y].sum+=m; acc[y].n++;
+    }
+    const out=[];
+    for(const y in acc){ if(acc[y].n>=300) out.push({year:+y, mean:acc[y].sum/acc[y].n}); }
+    out.sort((a,b)=>a.year-b.year);
+    return out;
+  }
+
+  // ---------- Model builder (uploaded file) ----------
+  function buildModelFromDaily(daily, opts){
+    // daily: [{date, tmax, tmin, precip}] in metric (°C, mm). opts: {place, tz, current}
+    daily = daily.filter(d=>d.date).sort((a,b)=>a.date<b.date?-1:1);
+    if(!daily.length) throw new Error("No dated rows found in the file.");
+    const last = daily[daily.length-1];
+    const todayDate = (opts.todayDate) || last.date;
+    const byDate = {}; daily.forEach(d=>byDate[d.date]=d);
+    const yestDate = dateAddDays(todayDate,-1);
+    const t = byDate[todayDate] || last;
+    const y = byDate[yestDate] || (daily.length>1?daily[daily.length-2]:null);
+
+    // synthesize an "archive-like" structure for reuse
+    const archive = {daily:{time:daily.map(d=>d.date), temperature_2m_max:daily.map(d=>num(d.tmax)),
+      temperature_2m_min:daily.map(d=>num(d.tmin)), precipitation_sum:daily.map(d=>num(d.precip))}};
+
+    const precipMap={}; const yr=todayDate.slice(0,4);
+    daily.forEach(d=>{ if(d.date.slice(0,4)===yr && d.precip!=null) precipMap[d.date]=num(d.precip)||0; });
+
+    const cur = opts.current||{};
+    return {
+      place: opts.place||"Uploaded data", tz: opts.tz||"UTC",
+      today:{date:todayDate, hi:num(t&&t.tmax), lo:num(t&&t.tmin), precip:num(t&&t.precip), sunrise:cur.sunrise||null, sunset:cur.sunset||null, code:cur.weather_code},
+      yesterday:{date:yestDate, hi:num(y&&y.tmax), lo:num(y&&y.tmin), precip:num(y&&y.precip), code:null},
+      current:{temp:num(cur.temp), apparent:num(cur.apparent), dew:num(cur.dew_point), humidity:num(cur.humidity),
+        windSpeed:num(cur.wind_speed), windGust:num(cur.wind_gust), windDir:num(cur.wind_direction),
+        pressure:num(cur.pressure), code:cur.weather_code, time:cur.time||todayDate+"T12:00"},
+      precipLedger: computeLedger(precipMap, todayDate, archive),
+      records: computeRecords(archive, todayDate),
+      annual: computeAnnual(archive),
+      _uploaded:true,
+    };
+  }
+  function num(v){ if(v===""||v==null) return null; const n=Number(v); return isNaN(n)?null:n; }
+
+  // ============================================================
+  //  RENDERING
+  // ============================================================
+  function renderAll(){
+    const m = state.uploaded || (state.A && state.A);
+    if(!m) return;
+    dash.classList.remove("hidden");
+    dateline.innerHTML = `<span class="loc">${escapeHTML(m.place)}</span> · ${prettyDate(m.today.date, m.tz)}`;
+    renderNow(m);
+    renderDome(m);
+    renderTempChart(m);
+    renderLedger(m);
+    renderHistory(m);
+    renderLong(m, state.compare? state.B : null);
+    renderH2H();
+  }
+  function escapeHTML(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  function renderNow(m){
+    const c = m.current, wi = weatherInfo(c.code);
+    $("nowH").textContent = m.place.split(",")[0] + " right now";
+    $("nowH").classList.remove("skeleton");
+    $("nowBody").innerHTML =
+      `<div class="bigtemp">${c.temp!=null?Math.round(tempNum(c.temp)):"—"}<span class="deg">°</span></div>
+       ${glyph(wi.icon,74)}
+       <div class="summary">
+         <div class="cond">${wi.label}</div>
+         <div class="feels">Feels like ${fTemp(c.apparent)} · updated ${fmtTime(c.time, m.tz)}</div>
+       </div>`;
+    const g = [
+      gauge("Dew point", fTemp(c.dew), "", arcDial(c.dew, -10, 30)),
+      gauge("Humidity", c.humidity!=null?Math.round(c.humidity):"—", "%", arcDial(c.humidity,0,100)),
+      gauge("Wind", fWind(c.windSpeed), windUnit()+(c.windDir!=null?" "+compass(c.windDir):""), windDial(c.windDir)),
+      gauge("Barometer", fPressure(c.pressure), pressureUnit(), arcDial(c.pressure, 980, 1040)),
+    ];
+    $("gauges").innerHTML = g.join("");
+  }
+  function gauge(lab,val,sub,dial){
+    return `<div class="gauge"><div class="lab">${lab}</div><div class="val">${val}</div><div class="sub">${sub||""}</div>${dial||""}</div>`;
+  }
+  function arcDial(v,min,max){
+    if(v==null||isNaN(v)) return "";
+    const f = Math.max(0,Math.min(1,(v-min)/(max-min)));
+    const w=100,h=42,cx=50,cy=40,r=34;
+    const a0=Math.PI, a1=0;
+    const p=(t)=>{const a=a0+(a1-a0)*t;return [cx+r*Math.cos(a),cy+r*Math.sin(a)*-1];};
+    const arc=(t0,t1,col,wid)=>{const[s0x,s0y]=p(t0),[e1x,e1y]=p(t1);
+      return `<path d="M${s0x.toFixed(1)} ${s0y.toFixed(1)} A${r} ${r} 0 0 1 ${e1x.toFixed(1)} ${e1y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="${wid}" stroke-linecap="round"/>`;};
+    const [hx,hy]=p(f);
+    return `<svg class="dial" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+      ${arc(0,1,"#23415C",5)}${arc(0,f,"var(--brass)",5)}
+      <circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="3.2" fill="var(--brass-soft)"/></svg>`;
+  }
+  function windDial(dir){
+    if(dir==null||isNaN(dir)) return arcDial(null);
+    const cx=50,cy=24,r=15, a=(dir-90)*Math.PI/180; // 0deg=N(up)
+    const tx=cx+Math.cos(a-Math.PI/2)*r, ty=cy+Math.sin(a-Math.PI/2)*r;
+    const bx=cx-Math.cos(a-Math.PI/2)*r*0.5, by=cy-Math.sin(a-Math.PI/2)*r*0.5;
+    return `<svg class="dial" viewBox="0 0 100 42" aria-hidden="true">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#23415C" stroke-width="1.5"/>
+      <text x="${cx}" y="${cy-r-1}" text-anchor="middle" fill="var(--muted-2)" font-size="6">N</text>
+      <line x1="${bx.toFixed(1)}" y1="${by.toFixed(1)}" x2="${tx.toFixed(1)}" y2="${ty.toFixed(1)}" stroke="var(--frost)" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="${tx.toFixed(1)}" cy="${ty.toFixed(1)}" r="2.6" fill="var(--frost)"/></svg>`;
+  }
+
+  function renderDome(m){
+    const tz=m.tz, sr=m.today.sunrise, ss=m.today.sunset;
+    const W=420,H=210, cx=W/2, cy=180, r=150;
+    let frac=null, isDay=false, dayLen="—";
+    if(sr&&ss){
+      const t0=new Date(sr).getTime(), t1=new Date(ss).getTime();
+      const now=Date.now();
+      frac=(now-t0)/(t1-t0);
+      isDay = frac>=0 && frac<=1;
+      const mins=Math.round((t1-t0)/60000); dayLen = Math.floor(mins/60)+"h "+(mins%60)+"m";
+    }
+    const ang = t => Math.PI - t*Math.PI; // t:0..1 -> left to right over top
+    const pt = t => [cx + r*Math.cos(ang(t)), cy - r*Math.sin(ang(t))];
+    const [arcSx,arcSy]=pt(0), [arcEx,arcEy]=pt(1);
+    // twilight + day path
+    let sun="";
+    if(frac!=null){
+      const ft=Math.max(0,Math.min(1,frac));
+      const [sx,sy]=pt(ft);
+      const cls = isDay? "sun-anim":"";
+      const fill = isDay? "var(--brass)":"var(--frost-deep)";
+      sun = `<g class="${cls}">
+        <circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="11" fill="${fill}" opacity="${isDay?1:.5}"/>
+        ${isDay?[...Array(8)].map((_,i)=>{const a=i*Math.PI/4;return `<line x1="${(sx+Math.cos(a)*15).toFixed(1)}" y1="${(sy+Math.sin(a)*15).toFixed(1)}" x2="${(sx+Math.cos(a)*20).toFixed(1)}" y2="${(sy+Math.sin(a)*20).toFixed(1)}" stroke="var(--brass)" stroke-width="1.6" stroke-linecap="round"/>`;}).join(""):""}
+      </g>`;
+    }
+    const ticks=[0,.25,.5,.75,1].map(t=>{const[x,y]=pt(t);return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.6" fill="var(--muted-2)"/>`;}).join("");
+    const html = `<div class="dome-wrap">
+      <svg class="dome" viewBox="0 0 ${W} ${H}" role="img" aria-label="Path of the sun from sunrise to sunset">
+        <defs>
+          <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="rgba(210,162,76,.16)"/><stop offset="1" stop-color="rgba(210,162,76,0)"/>
+          </linearGradient>
+        </defs>
+        <path d="M${arcSx} ${arcSy} A${r} ${r} 0 0 1 ${arcEx} ${arcEy} L${arcEx} ${cy} L${arcSx} ${cy} Z" fill="url(#sky)"/>
+        <line x1="20" y1="${cy}" x2="${W-20}" y2="${cy}" stroke="var(--line)" stroke-width="1.2"/>
+        <path d="M${arcSx} ${arcSy} A${r} ${r} 0 0 1 ${arcEx} ${arcEy}" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 5"/>
+        ${ticks}
+        <circle cx="${arcSx}" cy="${arcSy}" r="3.4" fill="var(--brass)"/>
+        <circle cx="${arcEx}" cy="${arcEy}" r="3.4" fill="var(--frost)"/>
+        ${sun}
+      </svg>
+      <div class="dome-times">
+        <div class="t rise"><div class="k">Sunrise</div><div class="v">${fmtTime(sr,tz)}</div></div>
+        <div class="t" style="text-align:center"><div class="k">Day length</div><div class="v" style="color:var(--parchment)">${dayLen}</div></div>
+        <div class="t set" style="text-align:right"><div class="k">Sunset</div><div class="v">${fmtTime(ss,tz)}</div></div>
+      </div>
+    </div>`;
+    $("domeBody").innerHTML = html;
+  }
+
+  function renderTempChart(m){
+    const groups = [
+      {name:"Yesterday", hi:m.yesterday.hi, lo:m.yesterday.lo, hc:"var(--brass)", lc:"var(--frost)"},
+      {name:"Today",     hi:m.today.hi,     lo:m.today.lo,     hc:"var(--brass)", lc:"var(--frost)"},
+      {name:"Record",    hi:m.records.hi,   lo:m.records.lo,   hc:"var(--ember)", lc:"var(--frost-deep)"},
+    ];
+    const vals = groups.flatMap(g=>[tempNum(g.hi),tempNum(g.lo)]).filter(v=>v!=null);
+    if(!vals.length){ $("tempChart").innerHTML='<p class="note">No temperature data available.</p>'; return; }
+    let lo=Math.min(...vals), hi=Math.max(...vals); const pad=Math.max(4,(hi-lo)*0.12); lo-=pad; hi+=pad;
+    const W=720,H=300, padL=44,padR=16,padT=18,padB=44;
+    const plotW=W-padL-padR, plotH=H-padT-padB;
+    const yfor=v=>padT+plotH-((v-lo)/(hi-lo))*plotH;
+    const gW=plotW/groups.length, barW=Math.min(46,gW*0.3);
+    // gridlines
+    let grid="",ax="";
+    const steps=5;
+    for(let i=0;i<=steps;i++){ const val=lo+(hi-lo)*i/steps; const yy=yfor(val);
+      grid+=`<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W-padR}" y2="${yy.toFixed(1)}" stroke="var(--line)" stroke-opacity=".5"/>`;
+      ax+=`<text x="${padL-8}" y="${(yy+3).toFixed(1)}" text-anchor="end" class="glabel">${Math.round(val)}°</text>`;
+    }
+    let bars="";
+    groups.forEach((g,gi)=>{
+      const cx=padL+gW*gi+gW/2;
+      const hv=tempNum(g.hi), lv=tempNum(g.lo);
+      const x1=cx-barW-3, x2=cx+3;
+      const y0=yfor(lo);
+      if(hv!=null){ const y=yfor(hv); bars+=`<g class="bar" style="animation-delay:${gi*.08}s"><rect x="${x1.toFixed(1)}" y="${y.toFixed(1)}" width="${barW}" height="${(y0-y).toFixed(1)}" rx="3" fill="${g.hc}"/></g>`+
+        `<text x="${(x1+barW/2).toFixed(1)}" y="${(y-6).toFixed(1)}" text-anchor="middle" class="barval">${Math.round(hv)}°</text>`; }
+      if(lv!=null){ const y=yfor(lv); bars+=`<g class="bar" style="animation-delay:${gi*.08+.04}s"><rect x="${x2.toFixed(1)}" y="${y.toFixed(1)}" width="${barW}" height="${(y0-y).toFixed(1)}" rx="3" fill="${g.lc}"/></g>`+
+        `<text x="${(x2+barW/2).toFixed(1)}" y="${(y-6).toFixed(1)}" text-anchor="middle" class="barval">${Math.round(lv)}°</text>`; }
+      bars+=`<text x="${cx.toFixed(1)}" y="${H-padB+20}" text-anchor="middle" class="glabel">${g.name}</text>`;
+      if(g.name==="Record"){
+        if(m.records.hiYear) bars+=`<text x="${(x1+barW/2).toFixed(1)}" y="${H-padB+33}" text-anchor="middle" class="glabel" style="font-size:9px;fill:var(--muted-2)">${m.records.hiYear}</text>`;
+        if(m.records.loYear) bars+=`<text x="${(x2+barW/2).toFixed(1)}" y="${H-padB+33}" text-anchor="middle" class="glabel" style="font-size:9px;fill:var(--muted-2)">${m.records.loYear}</text>`;
+      }
+    });
+    $("tempChart").innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily high and low temperatures for yesterday, today, and the record, in ${tempUnitLabel()}"><g class="axis">${grid}${ax}</g>${bars}</svg>`;
+    $("tempLegend").innerHTML =
+      `<span><i class="swatch" style="background:var(--brass)"></i>Daily high</span>
+       <span><i class="swatch" style="background:var(--frost)"></i>Daily low</span>
+       <span><i class="swatch" style="background:var(--ember)"></i>Record high</span>
+       <span><i class="swatch" style="background:var(--frost-deep)"></i>Record low</span>`;
+  }
+
+  function renderLedger(m){
+    const L=m.precipLedger, u=precipUnit();
+    const card=(lab,mm,normal)=>{
+      const amt=fPrecip(mm);
+      let normHtml="";
+      if(normal!=null){
+        const cur=precipNum(mm), nrm=precipNum(normal);
+        const pct = nrm>0 ? Math.round((cur/nrm)*100) : null;
+        normHtml=`<div class="norm">avg <b>${fPrecip(normal)} ${u}</b>${pct!=null?` · <b>${pct}%</b> of normal`:""}</div>`;
+      }
+      return `<div class="drop"><div class="lab">${lab}</div><div class="amt">${amt}<small>${u}</small></div>${normHtml}</div>`;
+    };
+    $("rainLedger").innerHTML = `<div class="row3">
+      ${card("Yesterday", L.yesterday, null)}
+      ${card(L.monthName+" so far", L.monthToDate, L.normalMTD)}
+      ${card(L.year+" so far", L.yearToDate, L.normalYTD)}
+    </div>`;
+    $("rainNote").textContent = L.normalYTD!=null
+      ? `Normals averaged over ${L.sampleYears} years to this date. "Normal" is the typical accumulation by ${MONTHS[+m.today.date.slice(5,7)-1]} ${(+m.today.date.slice(8,10))}.`
+      : "Daily totals to date.";
+  }
+
+  function renderHistory(m){
+    const r=m.records, md = MONTHS[+m.today.date.slice(5,7)-1]+" "+(+m.today.date.slice(8,10));
+    const rows=[];
+    rows.push(`<div class="item hi"><div class="k">Hottest <b>${md}</b> on record<span class="yr">${r.hiYear||""}</span></div><div class="v">${fTemp(r.hi)}${tempUnitLabel().replace("°","")}</div></div>`);
+    rows.push(`<div class="item lo"><div class="k">Coldest <b>${md}</b> on record<span class="yr">${r.loYear||""}</span></div><div class="v">${fTemp(r.lo)}${tempUnitLabel().replace("°","")}</div></div>`);
+    if(r.wet!=null && r.wet>0) rows.push(`<div class="item wet"><div class="k">Wettest <b>${md}</b> on record<span class="yr">${r.wetYear||""}</span></div><div class="v">${fPrecip(r.wet)} ${precipUnit()}</div></div>`);
+    // today vs record framing
+    if(m.today.hi!=null && r.hi!=null){
+      const gap=Math.round(tempNum(r.hi)-tempNum(m.today.hi));
+      rows.push(`<div class="item"><div class="k">Today's high vs. the record</div><div class="v" style="color:var(--muted)">${gap<=0?"ties / breaks it":gap+"°"+tempUnitLabel().replace("°","")+" short"}</div></div>`);
+    }
+    $("histBody").innerHTML = rows.join("");
+    $("histNote").textContent = r.samples
+      ? `Drawn from ${r.samples} observations of this calendar day, ${r.startYear}–${r.endYear}.`
+      : "No archive observations for this calendar day.";
+  }
+
+  function renderLong(m, mB){
+    const A=m.annual||[];
+    if(A.length<3){ $("longChart").innerHTML='<p class="note">Not enough archive years for a trend.</p>'; $("longLegend").innerHTML=""; $("longNote").textContent=""; return; }
+    const series=[{data:A, color:"var(--brass)", name:m.place.split(",")[0]}];
+    if(mB && mB.annual && mB.annual.length>=3) series.push({data:mB.annual, color:"var(--frost)", name:mB.place.split(",")[0]});
+
+    const allYears = series.flatMap(s=>s.data.map(d=>d.year));
+    const allMeans = series.flatMap(s=>s.data.map(d=>tempNum(d.mean)));
+    const x0=Math.min(...allYears), x1=Math.max(...allYears);
+    let y0=Math.min(...allMeans), y1=Math.max(...allMeans); const pad=Math.max(0.6,(y1-y0)*0.15); y0-=pad;y1+=pad;
+    const W=720,H=300, padL=46,padR=18,padT=16,padB=38, plotW=W-padL-padR, plotH=H-padT-padB;
+    const xf=y=>padL+((y-x0)/((x1-x0)||1))*plotW;
+    const yf=v=>padT+plotH-((v-y0)/((y1-y0)||1))*plotH;
+
+    let grid="",ax="";
+    for(let i=0;i<=4;i++){ const val=y0+(y1-y0)*i/4, yy=yf(val);
+      grid+=`<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W-padR}" y2="${yy.toFixed(1)}" stroke="var(--line)" stroke-opacity=".5"/>`;
+      ax+=`<text x="${padL-8}" y="${(yy+3).toFixed(1)}" text-anchor="end" class="glabel">${val.toFixed(1)}°</text>`;
+    }
+    const xticks=4;
+    for(let i=0;i<=xticks;i++){ const yr=Math.round(x0+(x1-x0)*i/xticks), xx=xf(yr);
+      ax+=`<text x="${xx.toFixed(1)}" y="${H-padB+18}" text-anchor="middle" class="glabel">${yr}</text>`;
+    }
+
+    let paths="", trends="", legend="", slopeNotes=[];
+    series.forEach((s,si)=>{
+      const d=s.data.map(p=>`${xf(p.year).toFixed(1)},${yf(tempNum(p.mean)).toFixed(1)}`).join(" L");
+      paths+=`<path class="spark" d="M${d}" fill="none" stroke="${s.color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      // linear regression for trend
+      const xs=s.data.map(p=>p.year), ys=s.data.map(p=>tempNum(p.mean));
+      const n=xs.length, sx=xs.reduce((a,b)=>a+b,0), sy=ys.reduce((a,b)=>a+b,0);
+      const sxx=xs.reduce((a,b)=>a+b*b,0), sxy=xs.reduce((a,b,i)=>a+b*ys[i],0);
+      const slope=(n*sxy-sx*sy)/(n*sxx-sx*sx), inter=(sy-slope*sx)/n;
+      const tx0=xf(x0), ty0=yf(slope*x0+inter), tx1=xf(x1), ty1=yf(slope*x1+inter);
+      trends+=`<line x1="${tx0.toFixed(1)}" y1="${ty0.toFixed(1)}" x2="${tx1.toFixed(1)}" y2="${ty1.toFixed(1)}" stroke="${s.color}" stroke-width="1.2" stroke-dasharray="4 4" opacity=".7"/>`;
+      const perDec=slope*10;
+      legend+=`<span><i class="swatch line" style="border-color:${s.color}"></i>${escapeHTML(s.name)}</span>`;
+      slopeNotes.push(`${s.name}: ${perDec>=0?"+":""}${perDec.toFixed(2)}${tempUnitLabel()}/decade`);
+    });
+    $("longChart").innerHTML=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Annual mean temperature by year"><g class="axis">${grid}${ax}</g>${trends}${paths}</svg>`;
+    // set path length for draw animation
+    $("longChart").querySelectorAll(".spark").forEach(p=>{ try{const len=p.getTotalLength(); p.style.setProperty("--len",len);}catch(e){} });
+    $("longLegend").innerHTML=legend+`<span><i class="swatch line" style="border-color:var(--muted);border-top-style:dashed"></i>Trend</span>`;
+    $("longNote").textContent = `Each point is a calendar-year average of daily mean temperature. Trend (least-squares): ${slopeNotes.join(" · ")}.`;
+  }
+
+  function renderH2H(){
+    const panel=$("h2hPanel");
+    if(!(state.compare && state.A && state.B)){ panel.classList.add("hidden"); return; }
+    panel.classList.remove("hidden");
+    const A=state.A, B=state.B, u=tempUnitLabel();
+    const rows=[
+      {k:"Current temperature", a:A.current.temp, b:B.current.temp, fmt:v=>fTemp(v), better:"warm"},
+      {k:"Today's high", a:A.today.hi, b:B.today.hi, fmt:v=>fTemp(v), better:"warm"},
+      {k:"Today's low", a:A.today.lo, b:B.today.lo, fmt:v=>fTemp(v), better:"warm"},
+      {k:"Record high (this date)", a:A.records.hi, b:B.records.hi, fmt:v=>fTemp(v), better:"warm"},
+      {k:"Rain this year ("+precipUnit()+")", a:A.precipLedger.yearToDate, b:B.precipLedger.yearToDate, fmt:v=>fPrecip(v), better:"none", precip:true},
+    ];
+    const body = rows.map(r=>{
+      const av=r.a, bv=r.b;
+      let aw="",bw="";
+      if(av!=null&&bv!=null&&r.better==="warm"){ if(av>bv)aw="win"; else if(bv>av)bw="win"; }
+      return `<tr><td>${r.k}</td><td class="${aw}">${r.fmt(av)}</td><td class="${bw}">${r.fmt(bv)}</td></tr>`;
+    }).join("");
+    $("h2hBody").innerHTML = `<table>
+      <thead><tr><th></th><th class="cityA">${escapeHTML(A.place.split(",")[0])}</th><th class="cityB">${escapeHTML(B.place.split(",")[0])}</th></tr></thead>
+      <tbody>${body}</tbody></table>`;
+  }
+
+  // ============================================================
+  //  Status helpers
+  // ============================================================
+  function setStatus(html, kind){
+    if(!html){ statusEl.innerHTML=""; return; }
+    statusEl.innerHTML = `<div class="banner ${kind||""}">${html}</div>`;
+  }
+  function loading(msg){ setStatus(`<span class="spin"></span>${escapeHTML(msg)}`); }
+  function errorMsg(msg){ setStatus(escapeHTML(msg), "err"); }
+
+  // ============================================================
+  //  Search + suggestions
+  // ============================================================
+  function placeLabel(p){
+    return [p.name, p.admin1, p.country].filter(Boolean).join(", ");
+  }
+  function wireSearch(inputId, btnId, listId, onPick){
+    const input=$(inputId), btn=$(btnId), list=$(listId);
+    let items=[], active=-1, t=null;
+
+    function close(){ list.classList.add("hidden"); list.innerHTML=""; active=-1; }
+    function show(results){
+      items=results;
+      if(!results.length){ close(); return; }
+      list.innerHTML = results.map((p,i)=>`<li role="option" data-i="${i}" aria-selected="false"><span class="nm">${escapeHTML(p.name)}${p.admin1?`<span style="color:var(--muted-2)"> · ${escapeHTML(p.admin1)}</span>`:""}</span><span class="co">${escapeHTML(p.country||"")}</span></li>`).join("");
+      list.classList.remove("hidden");
+      list.querySelectorAll("li").forEach(li=>{
+        li.addEventListener("click",()=>{ const p=items[+li.dataset.i]; close(); choose(p); });
+      });
+    }
+    async function lookup(){
+      const q=input.value.trim(); if(q.length<2){ close(); return; }
+      try{ const r=await geocode(q); show(r); }catch(e){ close(); }
+    }
+    function choose(p){ input.value=placeLabel(p); p.label=placeLabel(p); onPick(p); }
+
+    input.addEventListener("input",()=>{ clearTimeout(t); t=setTimeout(lookup,220); });
+    input.addEventListener("keydown",e=>{
+      if(list.classList.contains("hidden")){
+        if(e.key==="Enter"){ e.preventDefault(); doFirst(); }
+        return;
+      }
+      const lis=[...list.querySelectorAll("li")];
+      if(e.key==="ArrowDown"){ e.preventDefault(); active=Math.min(lis.length-1,active+1); }
+      else if(e.key==="ArrowUp"){ e.preventDefault(); active=Math.max(0,active-1); }
+      else if(e.key==="Enter"){ e.preventDefault(); if(active>=0){ choose(items[active]); close(); } else doFirst(); return; }
+      else if(e.key==="Escape"){ close(); return; }
+      else return;
+      lis.forEach((li,i)=>li.setAttribute("aria-selected", i===active?"true":"false"));
+    });
+    async function doFirst(){
+      const q=input.value.trim(); if(q.length<2) return;
+      loading("Locating "+q+"…");
+      try{ const r=await geocode(q); if(!r.length){ errorMsg(`No place found for "${q}". Try a different spelling or add a country.`); return; } const p=r[0]; choose(p); }
+      catch(e){ errorMsg("Could not reach the geocoder. Check your connection and try again."); }
+      close();
+    }
+    btn.addEventListener("click",doFirst);
+    document.addEventListener("click",e=>{ if(!list.contains(e.target)&&e.target!==input) close(); });
+    return { setValue:(v)=>{input.value=v;} };
+  }
+
+  // ============================================================
+  //  Load orchestration
+  // ============================================================
+  async function loadPrimary(place){
+    state.uploaded=null;
+    state.placeA=place;
+    loading(`Consulting the record for ${place.name}… (reading ${(new Date().getFullYear()-state.since)} years of archive)`);
+    try{
+      const model = await fetchCity(place);
+      state.A = model;
+      store.set("almanac.city", JSON.stringify({name:place.name,latitude:place.latitude,longitude:place.longitude,admin1:place.admin1,country:place.country,timezone:place.timezone,label:placeLabel(place)}));
+      setStatus("");
+      renderAll();
+      if(state.compare && state.B===null){ /* waiting for B */ }
+    }catch(e){
+      errorMsg("Could not assemble the almanac: "+e.message+". The archive request can be large — try a later start year, or another city.");
+    }
+  }
+  async function loadCompare(place){
+    state.placeB=place;
+    loading(`Reading ${place.name} for comparison…`);
+    try{
+      const model = await fetchCity(place);
+      state.B = model; setStatus(""); renderAll();
+    }catch(e){ errorMsg("Could not load the comparison city: "+e.message); }
+  }
+
+  // ============================================================
+  //  File upload parsing
+  // ============================================================
+  function parseCSV(text){
+    const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
+    if(!lines.length) throw new Error("Empty file.");
+    const header=lines[0].split(",").map(h=>h.trim().toLowerCase());
+    const di=header.indexOf("date"), xi=header.indexOf("tmax"), ni=header.indexOf("tmin"), pi=header.indexOf("precip");
+    if(di<0||xi<0||ni<0) throw new Error("CSV needs at least date, tmax, tmin columns.");
+    const rows=[];
+    for(let i=1;i<lines.length;i++){
+      const c=lines[i].split(",");
+      rows.push({date:(c[di]||"").trim(), tmax:c[xi], tmin:c[ni], precip:pi>=0?c[pi]:0});
+    }
+    return rows;
+  }
+  function convertUnits(daily, units){
+    if(!units) return daily;
+    const toC = units.temp==="F" ? (v)=> v==null?null:(Number(v)-32)*5/9 : (v)=>v;
+    const toMm= units.precip==="in" ? (v)=> v==null?null:Number(v)*25.4 : (v)=>v;
+    return daily.map(d=>({date:d.date, tmax:toC(d.tmax), tmin:toC(d.tmin), precip:toMm(d.precip)}));
+  }
+  function handleFile(file){
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        const text=String(reader.result);
+        let daily, opts={place:file.name.replace(/\.[^.]+$/,""), tz:"UTC", current:{}};
+        const trimmed=text.trim();
+        if(trimmed[0]==="{"||trimmed[0]==="["){
+          const json=JSON.parse(trimmed);
+          const obj=Array.isArray(json)?{daily:json}:json;
+          daily = obj.daily||[];
+          if(!daily.length) throw new Error("JSON has no 'daily' array.");
+          if(obj.units) daily=convertUnits(daily, obj.units);
+          if(obj.current){
+            const cu=obj.units||{};
+            opts.current={
+              temp: cu.temp==="F"&&obj.current.temp!=null?(obj.current.temp-32)*5/9:obj.current.temp,
+              apparent:obj.current.apparent,
+              dew_point: cu.temp==="F"&&obj.current.dew_point!=null?(obj.current.dew_point-32)*5/9:obj.current.dew_point,
+              humidity:obj.current.humidity,
+              wind_speed: cu.wind==="mph"&&obj.current.wind_speed!=null?obj.current.wind_speed*1.609344:obj.current.wind_speed,
+              wind_direction:obj.current.wind_direction,
+              pressure: cu.pressure==="inHg"&&obj.current.pressure!=null?obj.current.pressure/0.0295299830714:obj.current.pressure,
+              weather_code:obj.current.weather_code, time:obj.current.time,
+            };
+          }
+          opts.place=obj.place||opts.place; opts.tz=obj.timezone||opts.tz;
+        } else {
+          daily = parseCSV(text); // assumed metric
+        }
+        const model = buildModelFromDaily(daily, opts);
+        state.uploaded = model; state.A = model; state.B=null;
+        setStatus(`Loaded ${daily.length} daily records from <b>${escapeHTML(file.name)}</b>.`);
+        renderAll();
+      }catch(e){
+        errorMsg("Could not read that file: "+e.message);
+      }
+    };
+    reader.onerror=()=>errorMsg("Failed to read the file.");
+    reader.readAsText(file);
+  }
+
+  // ============================================================
+  //  Wire up controls
+  // ============================================================
+  const searchA = wireSearch("cityInput","searchBtn","suggest", loadPrimary);
+  const searchB = wireSearch("cityInputB","searchBtnB","suggestB", loadCompare);
+
+  function setUnits(u){
+    state.units=u;
+    $("unitUS").setAttribute("aria-pressed", u==="us");
+    $("unitSI").setAttribute("aria-pressed", u==="si");
+    store.set("almanac.units", u);
+    if(state.A||state.uploaded) renderAll();
+  }
+  $("unitUS").addEventListener("click",()=>setUnits("us"));
+  $("unitSI").addEventListener("click",()=>setUnits("si"));
+
+  $("sinceSel").addEventListener("change",e=>{
+    state.since=+e.target.value; store.set("almanac.since", state.since);
+    if(state.uploaded) return;            // uploaded data is unaffected by archive range
+    if(state.placeA) loadPrimary(state.placeA);
+    if(state.compare && state.B && state.placeB) loadCompare(state.placeB);
+  });
+
+  $("compareBtn").addEventListener("click",()=>{
+    state.compare=!state.compare;
+    $("compareBtn").setAttribute("aria-pressed", state.compare);
+    $("compareWrap").classList.toggle("hidden", !state.compare);
+    $("compareBtn").textContent = state.compare ? "− Hide comparison" : "＋ Compare a city";
+    if(!state.compare){ state.B=null; state.placeB=null; }
+    renderH2H();
+    if(state.compare && state.A) renderLong(state.A, state.B);
+    else if(state.A) renderLong(state.A, null);
+  });
+
+  $("fileInput").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) handleFile(f); });
+  $("clearUpload").addEventListener("click",()=>{
+    state.uploaded=null; $("fileInput").value="";
+    const saved=store.get("almanac.city");
+    if(saved){ try{ const p=JSON.parse(saved); searchA.setValue(p.label||p.name); loadPrimary(p); }catch(_){ dash.classList.add("hidden"); } }
+    else { dash.classList.add("hidden"); setStatus("Back to live data. Search a city to begin."); }
+  });
+
+  // ============================================================
+  //  Boot
+  // ============================================================
+  (function boot(){
+    const u=store.get("almanac.units"); if(u) setUnits(u); else setUnits("us");
+    const s=store.get("almanac.since"); if(s){ state.since=+s; $("sinceSel").value=s; }
+    const saved=store.get("almanac.city");
+    if(saved){
+      try{ const p=JSON.parse(saved); searchA.setValue(p.label||p.name); loadPrimary(p); return; }catch(_){}
+    }
+    // First-run: load a sensible default so the page is alive on open
+    loadPrimary({name:"Phoenix", admin1:"Arizona", country:"United States", latitude:33.4484, longitude:-112.074, timezone:"America/Phoenix", label:"Phoenix, Arizona, United States"});
+    searchA.setValue("Phoenix, Arizona, United States");
+  })();
+
+})();
+</script>
+</body>
+</html>
