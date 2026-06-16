@@ -72,18 +72,22 @@
   .dateline{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.06em;margin:12px 0 0;min-height:1.1em}
   .dateline .loc{color:var(--parchment)}
 
-  /* ---------- Console (search / controls) ---------- */
+  /* ---------- Console (pickers / controls) ---------- */
   .console{margin:20px auto 8px;max-width:760px}
-  .searchrow{display:flex;gap:8px;align-items:stretch}
-  .field{position:relative;flex:1}
-  .field svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted);pointer-events:none}
-  input[type=text]{
+  .pickrow{display:flex;gap:10px;align-items:flex-end}
+  @media(max-width:560px){.pickrow{flex-direction:column;align-items:stretch}}
+  .pick{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+  .pick .pl{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}
+  .pick select{
     width:100%;background:var(--night-2);border:1px solid var(--line);color:var(--parchment);
-    border-radius:11px;padding:13px 14px 13px 38px;font-family:var(--sans);font-size:.98rem;outline:none;
-    transition:border-color .15s, box-shadow .15s;
+    border-radius:11px;padding:13px 38px 13px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;outline:none;
+    transition:border-color .15s, box-shadow .15s;-webkit-appearance:none;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2390A6BD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 13px center;
   }
-  input[type=text]::placeholder{color:var(--muted-2)}
-  input[type=text]:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(210,162,76,.16)}
+  .pick select:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(210,162,76,.16)}
+  .pick select:disabled{opacity:.5;cursor:not-allowed}
+  .pick select option{background:#0E2034;color:var(--parchment)}
   .btn{
     background:var(--brass);color:#1A1206;border:1px solid var(--brass);
     font-family:var(--sans);font-weight:600;font-size:.92rem;padding:0 18px;border-radius:11px;cursor:pointer;
@@ -95,24 +99,15 @@
   .btn.ghost:hover{border-color:var(--brass);color:var(--brass-soft);filter:none}
   .btn[aria-pressed=true]{background:var(--night-3);color:var(--brass-soft);border-color:var(--brass)}
 
-  .meta{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;justify-content:center;margin-top:12px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;justify-content:center;margin-top:14px}
   .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--night-2)}
   .seg button{background:transparent;border:0;color:var(--muted);font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;
     padding:8px 12px;cursor:pointer;transition:background .15s,color .15s}
   .seg button[aria-pressed=true]{background:var(--brass);color:#1A1206}
   .selectwrap{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.05em}
-  select{background:var(--night-2);color:var(--parchment);border:1px solid var(--line);border-radius:9px;
+  .meta select{background:var(--night-2);color:var(--parchment);border:1px solid var(--line);border-radius:9px;
     padding:7px 9px;font-family:var(--mono);font-size:.74rem;cursor:pointer;outline:none}
-  select:focus{border-color:var(--brass)}
-
-  /* suggestions */
-  .suggest{position:relative;max-width:760px;margin:0 auto}
-  .suggest ul{list-style:none;margin:6px 0 0;padding:6px;position:absolute;left:0;right:0;z-index:30;
-    background:#0E2034;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
-  .suggest li{padding:10px 12px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;gap:12px}
-  .suggest li:hover,.suggest li[aria-selected=true]{background:var(--night-3)}
-  .suggest li .nm{font-weight:500}
-  .suggest li .co{color:var(--muted);font-family:var(--mono);font-size:.74rem;align-self:center}
+  .meta select:focus{border-color:var(--brass)}
 
   /* status */
   .status{max-width:760px;margin:14px auto 0;min-height:0}
@@ -262,14 +257,16 @@
 
   <!-- ===== Console ===== -->
   <section class="console" aria-label="Controls">
-    <div class="searchrow">
-      <div class="field">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" id="cityInput" autocomplete="off" placeholder="Search a city — e.g. Phoenix, Reykjavík, Nairobi" aria-label="Search for a city" />
-      </div>
-      <button class="btn" id="searchBtn">Read the day</button>
+    <div class="pickrow">
+      <label class="pick">
+        <span class="pl">State</span>
+        <select id="stateA" aria-label="Select a state"></select>
+      </label>
+      <label class="pick">
+        <span class="pl">City</span>
+        <select id="cityA" aria-label="Select a city" disabled></select>
+      </label>
     </div>
-    <div class="suggest"><ul id="suggest" class="hidden" role="listbox" aria-label="City matches"></ul></div>
 
     <div class="meta">
       <div class="seg" role="group" aria-label="Units">
@@ -287,14 +284,16 @@
       <button class="btn ghost" id="compareBtn" aria-pressed="false">＋ Compare a city</button>
     </div>
 
-    <div id="compareWrap" class="searchrow hidden" style="margin-top:10px">
-      <div class="field">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" id="cityInputB" autocomplete="off" placeholder="Second city to compare against" aria-label="Search for a second city" />
-      </div>
-      <button class="btn ghost" id="searchBtnB">Add</button>
+    <div id="compareWrap" class="pickrow hidden" style="margin-top:10px">
+      <label class="pick">
+        <span class="pl">State</span>
+        <select id="stateB" aria-label="Select a state to compare"></select>
+      </label>
+      <label class="pick">
+        <span class="pl">City</span>
+        <select id="cityB" aria-label="Select a city to compare" disabled></select>
+      </label>
     </div>
-    <div class="suggest"><ul id="suggestB" class="hidden" role="listbox" aria-label="Comparison city matches"></ul></div>
 
     <div class="uploader">
       <details class="up">
@@ -397,9 +396,12 @@
   ============================================================ */
 
   // ---------- Endpoints ----------
-  const GEO   = "https://geocoding-api.open-meteo.com/v1/search";
   const FCAST = "https://api.open-meteo.com/v1/forecast";
   const ARCH  = "https://archive-api.open-meteo.com/v1/archive";
+
+  // ---------- Cities dataset (state -> [[city, lat, lon], ...]) ----------
+  // Major U.S. cities with coordinates, embedded so selection needs no network.
+  const CITIES = {"Alabama":[["Auburn",32.6099,-85.4808],["Birmingham",33.5207,-86.8025],["Decatur",34.6059,-86.9833],["Dothan",31.2232,-85.3905],["Florence",34.7998,-87.6773],["Hoover",33.4054,-86.8114],["Huntsville",34.7304,-86.5861],["Madison",34.6993,-86.7483],["Mobile",30.6954,-88.0399],["Montgomery",32.3668,-86.3],["Phenix City",32.471,-85.0008],["Tuscaloosa",33.2098,-87.5692]],"Alaska":[["Anchorage",61.2181,-149.9003],["Bethel",60.8324,-161.8241],["Fairbanks",64.8402,-147.7104],["Homer",59.6655,-151.4626],["Juneau",58.3628,-134.5294],["Kenai",60.6145,-151.2546],["Ketchikan",55.372,-131.6832],["Kodiak",57.782,-152.5002],["Palmer",61.6138,-149.0653],["Sitka",57.0514,-135.3166],["Wasilla",61.5814,-149.4394]],"Arizona":[["Apache Junction",33.415,-111.5496],["Avondale",33.4356,-112.3496],["Buckeye",33.3703,-112.5838],["Bullhead City",35.1359,-114.5286],["Casa Grande",32.8795,-111.7574],["Chandler",33.3062,-111.8413],["Flagstaff",35.1983,-111.6513],["Gilbert",33.3528,-111.789],["Glendale",33.5387,-112.186],["Goodyear",33.4353,-112.3577],["Lake Havasu City",34.4839,-114.3225],["Marana",32.4364,-111.2224],["Maricopa",33.0581,-112.0476],["Mesa",33.4152,-111.8315],["Oro Valley",32.3909,-110.9665],["Peoria",33.5806,-112.2374],["Phoenix",33.4484,-112.074],["Prescott",34.54,-112.4685],["Prescott Valley",34.61,-112.3157],["Scottsdale",33.4942,-111.9261],["Sierra Vista",31.5455,-110.2773],["Surprise",33.6292,-112.3679],["Tempe",33.4255,-111.94],["Tucson",32.2217,-110.9265],["Yuma",32.6927,-114.6277]],"Arkansas":[["Bentonville",36.3729,-94.2088],["Conway",35.0887,-92.4421],["Fayetteville",36.0626,-94.1574],["Fort Smith",35.3859,-94.3985],["Jonesboro",35.8423,-90.7043],["Little Rock",34.7465,-92.2896],["North Little Rock",34.7695,-92.2671],["Pine Bluff",34.2284,-92.0032],["Rogers",36.332,-94.1185],["Springdale",36.1867,-94.1288]],"California":[["Anaheim",33.8353,-117.9145],["Bakersfield",35.3733,-119.0187],["Chula Vista",32.6401,-117.0842],["Corona",33.8753,-117.5664],["Elk Grove",38.4088,-121.3716],["Escondido",33.1192,-117.0864],["Fontana",34.0922,-117.435],["Fremont",37.5483,-121.9886],["Fresno",36.7468,-119.7726],["Garden Grove",33.7739,-117.9414],["Glendale",34.1425,-118.2551],["Hayward",37.6688,-122.0808],["Huntington Beach",33.6603,-117.9992],["Irvine",33.6839,-117.7947],["Lancaster",34.6868,-118.1542],["Long Beach",33.7701,-118.1937],["Los Angeles",34.0522,-118.2437],["Modesto",37.6391,-120.9969],["Moreno Valley",33.9425,-117.2297],["Oakland",37.8044,-122.2711],["Oceanside",33.1959,-117.3795],["Ontario",34.0633,-117.6509],["Orange",33.7878,-117.8531],["Oxnard",34.1975,-119.1771],["Palmdale",34.5794,-118.1165],["Pomona",34.0551,-117.75],["Rancho Cucamonga",34.1064,-117.5931],["Riverside",33.9533,-117.3962],["Sacramento",38.5816,-121.4944],["Salinas",36.6777,-121.6555],["San Bernardino",34.1083,-117.2898],["San Diego",32.7157,-117.1611],["San Francisco",37.7749,-122.4194],["San Jose",37.3382,-121.8863],["Santa Ana",33.7456,-117.8678],["Santa Clarita",34.3917,-118.5426],["Santa Rosa",38.4404,-122.7141],["Stockton",37.9577,-121.2908],["Sunnyvale",37.3688,-122.0363],["Torrance",33.8358,-118.3406]],"Colorado":[["Arvada",39.8028,-105.0875],["Aurora",39.7294,-104.8319],["Boulder",40.015,-105.2705],["Broomfield",39.9205,-105.0867],["Castle Rock",39.3722,-104.8561],["Centennial",39.5807,-104.8772],["Colorado Springs",38.8339,-104.8214],["Commerce City",39.8083,-104.9339],["Denver",39.7392,-104.9903],["Fort Collins",40.5853,-105.0844],["Grand Junction",39.0639,-108.5506],["Greeley",40.4233,-104.7091],["Lakewood",39.7047,-105.0814],["Littleton",39.6133,-105.0166],["Longmont",40.1672,-105.1019],["Loveland",40.3978,-105.075],["Northglenn",39.8962,-104.9811],["Parker",39.5186,-104.7614],["Pueblo",38.2544,-104.6091],["Thornton",39.868,-104.9719],["Westminster",39.8367,-105.0372]],"Connecticut":[["Bridgeport",41.1865,-73.1952],["Bristol",41.6718,-72.9493],["Danbury",41.3948,-73.454],["Greenwich",41.0302,-73.63],["Hartford",41.7637,-72.6851],["Meriden",41.5382,-72.807],["Middletown",41.5623,-72.6506],["Milford",41.2307,-73.064],["New Britain",41.6612,-72.7795],["New Haven",41.3083,-72.9279],["Norwalk",41.1177,-73.4082],["Norwich",41.5243,-72.0759],["Shelton",41.3165,-73.0932],["Stamford",41.0534,-73.5387],["Waterbury",41.5582,-73.0515],["West Haven",41.2705,-72.947]],"Delaware":[["Bear",39.6102,-75.6747],["Dover",39.1582,-75.5244],["Georgetown",38.679,-75.3932],["Middletown",39.4815,-75.6832],["Milford",38.9218,-75.4299],["Newark",39.6349,-75.6993],["Seaford",38.6404,-75.6041],["Smyrna",39.2934,-75.6008],["Wilmington",39.7391,-75.5398]],"District of Columbia":[["Washington",38.9072,-77.0369]],"Florida":[["Boca Raton",26.3683,-80.1289],["Boynton Beach",26.5318,-80.0905],["Cape Coral",26.5629,-81.9495],["Clearwater",27.9659,-82.8001],["Coral Springs",26.2712,-80.2706],["Davie",26.0765,-80.2521],["Daytona Beach",29.2108,-81.0228],["Deerfield Beach",26.3184,-80.0998],["Delray Beach",26.4615,-80.0728],["Deltona",28.9005,-81.2637],["Fort Lauderdale",26.1224,-80.1373],["Fort Myers",26.6406,-81.8723],["Gainesville",29.6516,-82.3248],["Hialeah",25.8576,-80.2781],["Hollywood",26.0112,-80.1495],["Homestead",25.4687,-80.4776],["Jacksonville",30.3322,-81.6557],["Kissimmee",28.292,-81.4076],["Lakeland",28.0395,-81.9498],["Largo",27.9095,-82.7873],["Lauderhill",26.1404,-80.2134],["Melbourne",28.0836,-80.6081],["Miami",25.7617,-80.1918],["Miami Beach",25.7907,-80.13],["Miami Gardens",25.942,-80.2456],["Miramar",25.9861,-80.3036],["Orlando",28.5383,-81.3792],["Palm Bay",28.0345,-80.5887],["Palm Coast",29.5845,-81.2079],["Pembroke Pines",26.0078,-80.2963],["Plantation",26.1276,-80.2331],["Pompano Beach",26.2379,-80.1248],["Port St. Lucie",27.273,-80.3582],["St. Petersburg",27.7731,-82.64],["Sunrise",26.167,-80.2566],["Tallahassee",30.4383,-84.2807],["Tamarac",26.2129,-80.2498],["Tampa",27.9506,-82.4572],["West Palm Beach",26.7153,-80.0534],["Weston",26.1004,-80.3998]],"Georgia":[["Albany",31.5785,-84.1557],["Alpharetta",34.0754,-84.2941],["Athens-Clarke County",33.9519,-83.3576],["Atlanta",33.749,-84.388],["Augusta-Richmond County",33.4735,-82.0105],["Brookhaven",33.8651,-84.3366],["Columbus",32.461,-84.9877],["Dunwoody",33.9462,-84.3346],["Johns Creek",34.0289,-84.1986],["Macon",32.8407,-83.6324],["Marietta",33.9526,-84.5499],["Peachtree Corners",33.9699,-84.2215],["Roswell",34.0232,-84.3616],["Sandy Springs",33.9304,-84.3733],["Savannah",32.0835,-81.0998],["Smyrna",33.884,-84.5144],["Valdosta",30.8327,-83.2785],["Warner Robins",32.613,-83.6242]],"Hawaii":[["Ewa Beach",21.3274,-158.0103],["Hilo",19.7025,-155.0939],["Honolulu",21.3069,-157.8583],["Kahului",20.8814,-156.4783],["Kailua",21.4063,-157.7448],["Kaneohe",21.4228,-157.8115],["Kapolei",21.3453,-158.087],["Kihei",20.7441,-156.4475],["Lihue",21.9816,-159.3683],["Mililani",21.4531,-158.0174],["Pearl City",21.4084,-157.9652],["Wailuku",20.8966,-156.5036],["Waipahu",21.3982,-158.0124]],"Idaho":[["Boise",43.6136,-116.2025],["Boise City",43.6187,-116.2146],["Caldwell",43.6629,-116.6874],["Coeur d'Alene",47.6777,-116.7805],["Idaho Falls",43.4917,-112.034],["Lewiston",46.3895,-116.9877],["Meridian",43.6121,-116.3915],["Moscow",46.7309,-116.9897],["Nampa",43.5407,-116.5635],["Pocatello",42.8713,-112.4455],["Post Falls",47.7205,-116.9353],["Sun Valley",43.6955,-114.3557],["Twin Falls",42.563,-114.4609]],"Illinois":[["Arlington Heights",42.0884,-87.9806],["Aurora",41.7606,-88.3201],["Bartlett",41.995,-88.1856],["Belleville",38.5201,-89.984],["Berwyn",41.8506,-87.7937],["Bloomington",40.4842,-88.9937],["Bolingbrook",41.6986,-88.0684],["Buffalo Grove",42.1663,-87.9631],["Champaign",40.1164,-88.2434],["Chicago",41.8781,-87.6298],["Cicero",41.8456,-87.7539],["Decatur",39.8403,-88.9548],["DeKalb",41.9295,-88.7504],["Des Plaines",42.0334,-87.8834],["Downers Grove",41.8089,-88.0112],["Elgin",42.0354,-88.2826],["Elmhurst",41.8995,-87.9403],["Evanston",42.0451,-87.6877],["Glenview",42.0698,-87.7878],["Hoffman Estates",42.063,-88.1227],["Joliet",41.525,-88.0817],["Lombard",41.88,-88.0078],["Moline",41.5067,-90.5151],["Mount Prospect",42.0664,-87.9373],["Naperville",41.7508,-88.1535],["Normal",40.5142,-88.9906],["Oak Lawn",41.72,-87.748],["Oak Park",41.885,-87.7845],["Orland Park",41.6303,-87.8539],["Palatine",42.1103,-88.0342],["Peoria",40.6936,-89.589],["Plainfield",41.6322,-88.212],["Rockford",42.2711,-89.094],["Schaumburg",42.0334,-88.0834],["Skokie",42.0324,-87.7416],["Springfield",39.7817,-89.6501],["Tinley Park",41.5731,-87.7933],["Urbana",40.1106,-88.2073],["Waukegan",42.3636,-87.8448],["Wheaton",41.8661,-88.107]],"Indiana":[["Anderson",40.1053,-85.6803],["Bloomington",39.1653,-86.5264],["Carmel",39.9784,-86.118],["Columbus",39.2014,-85.9214],["Elkhart",41.682,-85.9767],["Evansville",37.9716,-87.5711],["Fishers",39.9568,-86.0134],["Fort Wayne",41.0793,-85.1394],["Gary",41.5934,-87.3464],["Greenwood",39.6137,-86.1067],["Hammond",41.5834,-87.5],["Indianapolis",39.7684,-86.1581],["Jeffersonville",38.2776,-85.7372],["Kokomo",40.4864,-86.1336],["Lafayette",40.4167,-86.8753],["Lawrence",39.8387,-86.0253],["Mishawaka",41.662,-86.1586],["Muncie",40.1934,-85.3864],["Noblesville",40.0456,-86.0086],["South Bend",41.6764,-86.252],["Terre Haute",39.4667,-87.4139]],"Iowa":[["Ames",42.0347,-93.62],["Ankeny",41.7318,-93.6001],["Cedar Falls",42.5349,-92.4453],["Cedar Rapids",41.9779,-91.6656],["Council Bluffs",41.2619,-95.8608],["Davenport",41.5236,-90.5776],["Des Moines",41.6005,-93.6091],["Dubuque",42.5006,-90.6646],["Iowa City",41.6611,-91.5302],["Sioux City",42.5,-96.4003],["Urbandale",41.6267,-93.7122],["Waterloo",42.4928,-92.3426],["West Des Moines",41.5772,-93.7113]],"Kansas":[["Hutchinson",38.0608,-97.9298],["Kansas City",39.1141,-94.6275],["Lawrence",38.9717,-95.2353],["Lenexa",38.9536,-94.7336],["Manhattan",39.1836,-96.5717],["Olathe",38.8814,-94.8191],["Overland Park",38.9822,-94.6708],["Salina",38.8403,-97.6114],["Shawnee",39.0228,-94.7152],["Topeka",39.0558,-95.689],["Wichita",37.6889,-97.3361]],"Kentucky":[["Bowling Green",36.9685,-86.4808],["Covington",39.0837,-84.5086],["Elizabethtown",37.707,-85.859],["Florence",38.9989,-84.6267],["Frankfort",38.1928,-84.8806],["Georgetown",38.2117,-84.5562],["Hopkinsville",36.8621,-87.4851],["Lexington",38.0174,-84.4854],["Lexington-Fayette",38.0406,-84.5037],["Louisville",38.2527,-85.7585],["Owensboro",37.7719,-87.1112],["Paducah",37.0634,-88.6632],["Richmond",37.7546,-84.2955]],"Louisiana":[["Alexandria",31.3113,-92.4451],["Baton Rouge",30.4583,-91.1403],["Bossier City",32.516,-93.7321],["Houma",29.5943,-90.7548],["Kenner",29.9941,-90.2417],["Lafayette",30.2241,-92.0198],["Lake Charles",30.2266,-93.2174],["Metairie",29.9871,-90.1695],["Monroe",32.5093,-92.1193],["New Orleans",29.9511,-90.0715],["Shreveport",32.5252,-93.7502],["Slidell",30.2784,-89.7712]],"Maine":[["Auburn",44.0948,-70.239],["Augusta",44.3232,-69.7665],["Bangor",44.8242,-68.7918],["Biddeford",43.4836,-70.4719],["Brunswick",43.8976,-69.9555],["Lewiston",44.0985,-70.1916],["Portland",43.6615,-70.2553],["Saco",43.5209,-70.4546],["South Portland",43.6318,-70.2709],["Waterville",44.548,-69.6359],["Westbrook",43.6843,-70.358]],"Maryland":[["Annapolis",38.9784,-76.4922],["Baltimore",39.2904,-76.6122],["Bethesda",38.9806,-77.1008],["Bowie",39.0068,-76.7791],["College Park",38.9963,-76.9299],["Columbia",39.2141,-76.8788],["Frederick",39.4143,-77.4105],["Gaithersburg",39.1434,-77.2014],["Germantown",39.1704,-77.2699],["Hagerstown",39.6418,-77.72],["Rockville",39.084,-77.1528],["Salisbury",38.363,-75.5922],["Silver Spring",39.0191,-77.0076],["Waldorf",38.6371,-76.8778]],"Massachusetts":[["Attleboro",41.9445,-71.2856],["Barnstable Town",41.7003,-70.3002],["Beverly",42.5584,-70.88],["Boston",42.3601,-71.0589],["Brockton",42.0834,-71.0184],["Cambridge",42.3736,-71.1097],["Chelsea",42.3918,-71.0328],["Chicopee",42.1487,-72.6079],["Everett",42.4084,-71.0537],["Fall River",41.7015,-71.155],["Fitchburg",42.5834,-71.8023],["Haverhill",42.7762,-71.0773],["Holyoke",42.2043,-72.6162],["Lawrence",42.707,-71.1631],["Leominster",42.5251,-71.7598],["Lowell",42.6334,-71.3162],["Lynn",42.4668,-70.9495],["Malden",42.4251,-71.0662],["Marlborough",42.3459,-71.5523],["Medford",42.4184,-71.1062],["Methuen",42.7262,-71.1909],["New Bedford",41.6362,-70.9342],["Newton",42.337,-71.2092],["Peabody",42.5279,-70.9287],["Pittsfield",42.4501,-73.2454],["Quincy",42.2529,-71.0023],["Revere",42.4084,-71.012],["Salem",42.5195,-70.8967],["Somerville",42.3876,-71.0995],["Springfield",42.1015,-72.5898],["Taunton",41.9001,-71.0898],["Waltham",42.3765,-71.2356],["Westfield",42.1251,-72.7495],["Weymouth Town",42.2181,-70.941],["Woburn",42.4793,-71.1523],["Worcester",42.2626,-71.8023]],"Michigan":[["Ann Arbor",42.2808,-83.743],["Battle Creek",42.3212,-85.1797],["Dearborn",42.3223,-83.1763],["Dearborn Heights",42.337,-83.2733],["Detroit",42.3314,-83.0458],["East Lansing",42.737,-84.4839],["Farmington Hills",42.499,-83.3677],["Flint",43.0125,-83.6875],["Grand Rapids",42.9634,-85.6681],["Kalamazoo",42.2917,-85.5872],["Kentwood",42.8695,-85.6447],["Lansing",42.7325,-84.5555],["Lincoln Park",42.2506,-83.1785],["Livonia",42.3684,-83.3527],["Midland",43.6156,-84.2472],["Muskegon",43.2342,-86.2484],["Novi",42.4806,-83.4755],["Pontiac",42.6389,-83.291],["Portage",42.2012,-85.58],["Rochester Hills",42.6584,-83.1499],["Roseville",42.4973,-82.9371],["Royal Oak",42.4895,-83.1446],["Saginaw",43.4195,-83.9508],["Southfield",42.4734,-83.2219],["St. Clair Shores",42.4974,-82.8964],["Sterling Heights",42.5803,-83.0302],["Taylor",42.2409,-83.2697],["Troy",42.6064,-83.1498],["Warren",42.5145,-83.0147],["Westland",42.3242,-83.4002],["Wyoming",42.9134,-85.7053]],"Minnesota":[["Apple Valley",44.7319,-93.2177],["Blaine",45.1608,-93.2349],["Bloomington",44.8408,-93.2983],["Brooklyn Park",45.0941,-93.3563],["Burnsville",44.7677,-93.2777],["Coon Rapids",45.1732,-93.303],["Duluth",46.7867,-92.1005],["Eagan",44.8041,-93.1669],["Eden Prairie",44.8547,-93.4708],["Edina",44.8897,-93.3499],["Lakeville",44.6497,-93.2427],["Mankato",44.1636,-93.9994],["Maple Grove",45.0725,-93.4558],["Maplewood",44.953,-92.9952],["Minneapolis",44.9778,-93.265],["Minnetonka",44.9212,-93.4687],["Moorhead",46.8738,-96.7678],["Plymouth",45.0105,-93.4555],["Rochester",44.0121,-92.4802],["Saint Paul",44.9027,-93.0964],["Shakopee",44.7974,-93.5273],["St. Cloud",45.5579,-94.1632],["St. Louis Park",44.9597,-93.3702],["St. Paul",44.9537,-93.09],["Woodbury",44.9239,-92.9594]],"Mississippi":[["Biloxi",30.396,-88.8853],["Greenville",33.3787,-91.0468],["Gulfport",30.3674,-89.0928],["Hattiesburg",31.3271,-89.2903],["Jackson",32.2988,-90.1848],["Meridian",32.3643,-88.7037],["Olive Branch",34.9441,-89.8544],["Oxford",34.3544,-89.4969],["Southaven",34.989,-90.0126],["Starkville",33.4501,-88.8176],["Tupelo",34.2538,-88.7209],["Vicksburg",32.3258,-90.8507]],"Missouri":[["Blue Springs",39.017,-94.2816],["Cape Girardeau",37.3059,-89.5181],["Chesterfield",38.6631,-90.5771],["Columbia",38.9517,-92.3341],["Florissant",38.7892,-90.3226],["Independence",39.0911,-94.4155],["Jefferson City",38.5767,-92.1735],["Joplin",37.0842,-94.5133],["Kansas City",39.0997,-94.5786],["Lee's Summit",38.9108,-94.3822],["O'Fallon",38.8106,-90.6998],["Springfield",37.209,-93.2923],["St. Charles",38.7881,-90.4974],["St. Joseph",39.7675,-94.8467],["St. Louis",38.627,-90.1994],["St. Peters",38.7875,-90.6299]],"Montana":[["Anaconda",46.1299,-112.9739],["Billings",45.7833,-108.5007],["Bozeman",45.677,-111.0429],["Butte",45.9916,-112.5178],["Great Falls",47.4942,-111.2833],["Havre",48.5561,-109.688],["Helena",46.6131,-112.0213],["Kalispell",48.2209,-114.2892],["Missoula",46.8787,-113.9966],["Whitefish",48.404,-114.3509]],"Nebraska":[["Bellevue",41.1544,-95.9146],["Columbus",41.4372,-97.3565],["Fremont",41.4416,-96.4945],["Grand Island",40.9264,-98.342],["Hastings",40.5877,-98.3911],["Kearney",40.7086,-99.1203],["Lincoln",40.8258,-96.6852],["Norfolk",42.0329,-97.4229],["North Platte",41.1326,-100.7746],["Omaha",41.2524,-95.998]],"Nevada":[["Boulder City",35.9727,-114.8344],["Carson City",39.1638,-119.7674],["Elko",40.8262,-115.7247],["Fernley",39.6019,-119.235],["Henderson",36.0395,-114.9817],["Las Vegas",36.1699,-115.1398],["Mesquite",36.8055,-114.0663],["North Las Vegas",36.1989,-115.1175],["Reno",39.5296,-119.8138],["Sparks",39.5349,-119.7527]],"New Hampshire":[["Concord",43.2081,-71.5376],["Derry",42.8874,-71.302],["Dover",43.19,-70.8849],["Keene",42.9431,-72.2895],["Laconia",43.5387,-71.4529],["Manchester",42.9956,-71.4548],["Merrimack",42.8667,-71.5128],["Nashua",42.7654,-71.4676],["Portsmouth",43.0665,-70.7804],["Rochester",43.2684,-70.9766],["Salem",42.7846,-71.2176]],"New Jersey":[["Atlantic City",39.3643,-74.4229],["Bayonne",40.6687,-74.1143],["Camden",39.9259,-75.1196],["Clifton",40.8584,-74.1638],["East Orange",40.7673,-74.2049],["Elizabeth",40.664,-74.2107],["Hackensack",40.8859,-74.0435],["Hoboken",40.744,-74.0324],["Jersey City",40.7282,-74.0776],["Kearny",40.7684,-74.1454],["Linden",40.622,-74.2446],["New Brunswick",40.4862,-74.4518],["Newark",40.7357,-74.1724],["Passaic",40.8568,-74.1285],["Paterson",40.9168,-74.1718],["Perth Amboy",40.5068,-74.2654],["Plainfield",40.6337,-74.4074],["Sayreville",40.4594,-74.3608],["Trenton",40.2171,-74.7429],["Union City",40.6976,-74.2632],["Vineland",39.4864,-75.026],["West New York",40.7879,-74.0143]],"New Mexico":[["Alamogordo",32.8932,-105.9485],["Albuquerque",35.0853,-106.6056],["Carlsbad",32.4119,-104.2395],["Clovis",34.4048,-103.2052],["Farmington",36.7281,-108.2187],["Gallup",35.5065,-108.7414],["Hobbs",32.7222,-103.1372],["Las Cruces",32.3199,-106.7637],["Los Alamos",35.8663,-106.2676],["Rio Rancho",35.2328,-106.663],["Roswell",33.3943,-104.523],["Santa Fe",35.687,-105.9378],["Taos",36.3953,-105.5847]],"New York":[["Albany",42.6526,-73.7562],["Binghamton",42.0987,-75.918],["Buffalo",42.8864,-78.8784],["Freeport",40.6576,-73.5832],["Hempstead",40.7062,-73.6187],["Mount Vernon",40.9126,-73.8371],["New Rochelle",40.9115,-73.7824],["New York",40.7128,-74.0059],["Niagara Falls",43.0962,-79.0377],["Rochester",43.161,-77.6109],["Schenectady",42.8142,-73.9396],["Syracuse",43.0481,-76.1474],["Troy",42.7284,-73.6918],["Utica",43.1009,-75.2327],["Valley Stream",40.6643,-73.7085],["White Plains",41.034,-73.7629],["Yonkers",40.9312,-73.8987]],"North Carolina":[["Apex",35.7327,-78.8503],["Asheville",35.5951,-82.5515],["Burlington",36.0957,-79.4378],["Cary",35.7915,-78.7811],["Chapel Hill",35.9132,-79.0558],["Charlotte",35.2271,-80.8431],["Concord",35.4088,-80.5795],["Durham",35.994,-78.8986],["Fayetteville",35.0527,-78.8784],["Gastonia",35.2621,-81.1873],["Greensboro",36.0726,-79.792],["Greenville",35.6127,-77.3664],["Hickory",35.7345,-81.3445],["High Point",35.9557,-80.0053],["Huntersville",35.4107,-80.8429],["Jacksonville",34.7541,-77.4302],["Kannapolis",35.4874,-80.6217],["Raleigh",35.7796,-78.6382],["Rocky Mount",35.9382,-77.7905],["Wilmington",34.2257,-77.9447],["Wilson",35.7213,-77.9155],["Winston-Salem",36.0999,-80.2442]],"North Dakota":[["Bismarck",46.8083,-100.7837],["Dickinson",46.8873,-102.7876],["Fargo",46.8772,-96.7898],["Grand Forks",47.9253,-97.0329],["Jamestown",46.9059,-98.7061],["Mandan",46.8306,-100.9092],["Minot",48.233,-101.2923],["Wahpeton",46.2651,-96.6133],["West Fargo",46.8695,-96.895],["Williston",48.1679,-103.6317]],"Ohio":[["Akron",41.0814,-81.519],["Beavercreek",39.7092,-84.0633],["Canton",40.7989,-81.3784],["Cincinnati",39.1031,-84.512],["Cleveland",41.4993,-81.6944],["Cleveland Heights",41.5201,-81.5562],["Columbus",39.9612,-82.9988],["Cuyahoga Falls",41.1339,-81.4846],["Dayton",39.7589,-84.1916],["Dublin",40.0992,-83.1141],["Elyria",41.3684,-82.1076],["Euclid",41.5931,-81.5268],["Fairfield",39.3455,-84.5603],["Findlay",41.0442,-83.6499],["Grove City",39.8815,-83.093],["Hamilton",39.3995,-84.5613],["Huber Heights",39.8439,-84.1247],["Kettering",39.6895,-84.1688],["Lakewood",41.482,-81.7982],["Lancaster",39.7137,-82.5993],["Lima",40.7426,-84.1052],["Lorain",41.4528,-82.1824],["Mansfield",40.7584,-82.5154],["Mentor",41.6662,-81.3396],["Middletown",39.5151,-84.3983],["Newark",40.0581,-82.4013],["Parma",41.4048,-81.7229],["Springfield",39.9242,-83.8088],["Strongsville",41.3145,-81.8357],["Toledo",41.6639,-83.5552],["Warren",41.2376,-80.8184],["Westerville",40.1262,-82.9291],["Youngstown",41.0998,-80.6495]],"Oklahoma":[["Broken Arrow",36.0609,-95.7975],["Edmond",35.6528,-97.4781],["Enid",36.3956,-97.8784],["Lawton",34.6036,-98.3959],["Midwest City",35.4495,-97.3967],["Moore",35.3395,-97.4867],["Muskogee",35.7479,-95.3697],["Norman",35.2226,-97.4395],["Oklahoma City",35.4676,-97.5164],["Stillwater",36.1156,-97.0584],["Tulsa",36.154,-95.9928]],"Oregon":[["Albany",44.6365,-123.1059],["Beaverton",45.4871,-122.8037],["Bend",44.0582,-121.3153],["Corvallis",44.5646,-123.262],["Eugene",44.0521,-123.0868],["Gresham",45.5001,-122.4302],["Hillsboro",45.5229,-122.9898],["Keizer",44.9901,-123.0262],["Lake Oswego",45.4207,-122.6706],["Medford",42.3265,-122.8756],["Portland",45.5231,-122.6765],["Salem",44.9429,-123.0351],["Springfield",44.0462,-123.022],["Tigard",45.4312,-122.7715]],"Pennsylvania":[["Allentown",40.6084,-75.4902],["Altoona",40.5187,-78.3947],["Bethlehem",40.6259,-75.3705],["Erie",42.1292,-80.0851],["Harrisburg",40.2732,-76.8867],["Lancaster",40.0379,-76.3055],["Philadelphia",39.9526,-75.1652],["Pittsburgh",40.4406,-79.9959],["Reading",40.3356,-75.9269],["Scranton",41.409,-75.6624],["State College",40.7934,-77.86],["Wilkes-Barre",41.2459,-75.8813],["York",39.9626,-76.7277]],"Rhode Island":[["Bristol",41.6825,-71.2676],["Central Falls",41.8883,-71.3945],["Cranston",41.7798,-71.4373],["East Providence",41.8137,-71.3701],["Newport",41.5045,-71.3035],["Pawtucket",41.8787,-71.3826],["Providence",41.824,-71.4128],["Warwick",41.7001,-71.4162],["Westerly",41.3691,-71.8126],["Woonsocket",42.0029,-71.5148]],"South Carolina":[["Charleston",32.7765,-79.9311],["Columbia",34.0007,-81.0348],["Florence",34.1954,-79.7626],["Goose Creek",32.981,-80.0326],["Greenville",34.8526,-82.394],["Hilton Head Island",32.2163,-80.7526],["Mount Pleasant",32.8323,-79.8284],["North Charleston",32.8546,-79.9748],["Rock Hill",34.9249,-81.0251],["Spartanburg",34.9496,-81.932],["Summerville",33.0185,-80.1756],["Sumter",33.9204,-80.3415]],"South Dakota":[["Aberdeen",45.4661,-98.4856],["Brookings",44.3056,-96.7914],["Huron",44.359,-98.2163],["Mitchell",43.7109,-98.027],["Pierre",44.3695,-100.3211],["Rapid City",44.0805,-103.231],["Sioux Falls",43.5446,-96.7311],["Vermillion",42.7951,-96.9258],["Watertown",44.9043,-97.124],["Yankton",42.8821,-97.3986]],"Tennessee":[["Bartlett",35.2045,-89.874],["Brentwood",36.0331,-86.7828],["Chattanooga",35.0456,-85.3097],["Clarksville",36.5298,-87.3595],["Cleveland",35.1595,-84.8766],["Collierville",35.042,-89.6645],["Franklin",35.9251,-86.8689],["Germantown",35.0868,-89.8101],["Hendersonville",36.3048,-86.62],["Jackson",35.6145,-88.8139],["Johnson City",36.3134,-82.3535],["Kingsport",36.5484,-82.5618],["Knoxville",35.9606,-83.9207],["Memphis",35.1495,-90.049],["Murfreesboro",35.8456,-86.3903],["Nashville",36.1627,-86.7816],["Smyrna",35.9828,-86.5186]],"Texas":[["Abilene",32.4487,-99.7331],["Allen",33.1032,-96.6706],["Amarillo",35.222,-101.8313],["Arlington",32.7357,-97.1081],["Austin",30.2672,-97.7431],["Beaumont",30.0802,-94.1266],["Brownsville",25.9017,-97.4975],["Carrollton",32.9756,-96.89],["College Station",30.628,-96.3344],["Corpus Christi",27.8006,-97.3964],["Dallas",32.7767,-96.797],["Denton",33.2148,-97.1331],["El Paso",31.7776,-106.4425],["Fort Worth",32.7555,-97.3308],["Frisco",33.1507,-96.8236],["Garland",32.9126,-96.6389],["Grand Prairie",32.746,-96.9978],["Houston",29.7604,-95.3698],["Irving",32.814,-96.9489],["Killeen",31.1171,-97.7278],["Laredo",27.5306,-99.4803],["League City",29.5075,-95.0949],["Lewisville",33.0462,-96.9942],["Lubbock",33.5779,-101.8552],["McAllen",26.2034,-98.23],["McKinney",33.1972,-96.6398],["Mesquite",32.7668,-96.5992],["Midland",31.9973,-102.0779],["Odessa",31.8457,-102.3676],["Pasadena",29.6911,-95.2091],["Pearland",29.5636,-95.286],["Plano",33.0198,-96.6989],["Richardson",32.9483,-96.7299],["Round Rock",30.5083,-97.6789],["San Angelo",31.4638,-100.437],["San Antonio",29.4241,-98.4936],["Sugar Land",29.6197,-95.6349],["Tyler",32.3513,-95.3011],["Waco",31.5493,-97.1467],["Wichita Falls",33.9137,-98.4934]],"Utah":[["Bountiful",40.8894,-111.8808],["Draper",40.5247,-111.8638],["Layton",41.0602,-111.9711],["Lehi",40.3916,-111.8508],["Logan",41.737,-111.8338],["Murray",40.6669,-111.888],["Ogden",41.223,-111.9738],["Orem",40.2969,-111.6946],["Provo",40.2338,-111.6585],["Riverton",40.5219,-111.9391],["Roy",41.1616,-112.0263],["Salt Lake City",40.7608,-111.891],["Sandy",40.565,-111.839],["South Jordan",40.5622,-111.9297],["Spanish Fork",40.115,-111.6549],["St. George",37.0965,-113.5684],["Taylorsville",40.6677,-111.9388],["West Jordan",40.6097,-111.9391],["West Valley City",40.6916,-112.0011]],"Vermont":[["Barre",44.1945,-72.4936],["Bennington",42.8827,-73.1923],["Brattleboro",42.8574,-72.5933],["Burlington",44.4759,-73.2121],["Essex Junction",44.5035,-73.0906],["Montpelier",44.2574,-72.5698],["Rutland",43.6141,-72.9708],["South Burlington",44.4513,-73.1796],["Winooski",44.4949,-73.1874]],"Virginia":[["Alexandria",38.8048,-77.0469],["Blacksburg",37.2296,-80.4139],["Charlottesville",38.0293,-78.4767],["Chesapeake",36.7682,-76.2875],["Danville",36.586,-79.395],["Hampton",37.0299,-76.3452],["Harrisonburg",38.4496,-78.8689],["Leesburg",39.1157,-77.5636],["Lynchburg",37.4138,-79.1422],["Manassas",38.7509,-77.4753],["Newport News",37.0871,-76.473],["Norfolk",36.8508,-76.2859],["Portsmouth",36.8354,-76.2983],["Richmond",37.5407,-77.436],["Roanoke",37.271,-79.9414],["Suffolk",36.7282,-76.5836],["Virginia Beach",36.8529,-75.978]],"Washington":[["Auburn",47.3073,-122.2285],["Bellevue",47.6104,-122.2007],["Bellingham",48.7491,-122.4781],["Bremerton",47.5673,-122.6329],["Burien",47.4704,-122.3468],["Edmonds",47.8107,-122.3774],["Everett",47.979,-122.2021],["Federal Way",47.3223,-122.3126],["Kennewick",46.2112,-119.1372],["Kent",47.3809,-122.2348],["Kirkland",47.6815,-122.2087],["Lacey",47.0343,-122.8232],["Lakewood",47.1718,-122.5185],["Marysville",48.0518,-122.1771],["Olympia",47.0379,-122.9007],["Pasco",46.2396,-119.1006],["Puyallup",47.1854,-122.2929],["Redmond",47.674,-122.1215],["Renton",47.4829,-122.2171],["Richland",46.2857,-119.2845],["Sammamish",47.6163,-122.0356],["Seattle",47.6062,-122.3321],["Shoreline",47.7557,-122.3415],["Spokane",47.6588,-117.426],["Spokane Valley",47.6732,-117.2394],["Tacoma",47.2529,-122.4443],["Vancouver",45.6387,-122.6615],["Yakima",46.6021,-120.5059]],"West Virginia":[["Beckley",37.7932,-81.2061],["Charleston",38.3498,-81.6326],["Clarksburg",39.2784,-80.3487],["Fairmont",39.4727,-80.146],["Huntington",38.4192,-82.4452],["Martinsburg",39.46,-77.9589],["Morgantown",39.6368,-80.018],["Parkersburg",39.2644,-81.5354],["Weirton",40.4137,-80.5683],["Wheeling",40.0727,-80.6851]],"Wisconsin":[["Appleton",44.2619,-88.4154],["Beloit",42.5083,-89.0318],["Brookfield",43.0606,-88.1065],["Eau Claire",44.8113,-91.4985],["Fond du Lac",43.773,-88.4471],["Green Bay",44.5192,-88.0198],["Greenfield",42.9614,-88.0126],["Janesville",42.6828,-89.0187],["Kenosha",42.5847,-87.8212],["La Crosse",43.8014,-91.2396],["Madison",43.0731,-89.4012],["Milwaukee",43.0389,-87.9065],["New Berlin",42.9764,-88.1084],["Oshkosh",44.0247,-88.5426],["Racine",42.7261,-87.7829],["Sheboygan",43.7508,-87.7145],["Waukesha",43.0117,-88.2315],["Wausau",44.9591,-89.6301],["Wauwatosa",43.0495,-88.0076],["West Allis",43.0167,-88.007]],"Wyoming":[["Casper",42.8666,-106.3131],["Cheyenne",41.14,-104.8202],["Cody",44.5231,-109.0756],["Evanston",41.2609,-110.9631],["Gillette",44.282,-105.4974],["Green River",41.5196,-109.4714],["Jackson",43.4607,-110.7663],["Laramie",41.3129,-105.5811],["Riverton",43.0458,-108.4113],["Rock Springs",41.606,-109.23],["Sheridan",44.7849,-106.9648]]};
 
   // ---------- State ----------
   const state = {
@@ -510,11 +512,6 @@
     const res = await fetch(url, {headers:{Accept:"application/json"}});
     if(!res.ok) throw new Error("Request failed ("+res.status+")");
     return res.json();
-  }
-  async function geocode(q){
-    const url = `${GEO}?name=${encodeURIComponent(q)}&count=6&language=en&format=json`;
-    const data = await getJSON(url);
-    return data.results || [];
   }
 
   function todayUTC(){ return new Date().toISOString().slice(0,10); }
@@ -972,55 +969,66 @@
   function errorMsg(msg){ setStatus(escapeHTML(msg), "err"); }
 
   // ============================================================
-  //  Search + suggestions
+  //  City pickers (State -> City dropdowns, no network needed)
   // ============================================================
   function placeLabel(p){
     return [p.name, p.admin1, p.country].filter(Boolean).join(", ");
   }
-  function wireSearch(inputId, btnId, listId, onPick){
-    const input=$(inputId), btn=$(btnId), list=$(listId);
-    let items=[], active=-1, t=null;
+  function makePlace(state, cityRow){
+    // cityRow = [name, lat, lon]
+    return {
+      name: cityRow[0], admin1: state, country: "United States",
+      latitude: cityRow[1], longitude: cityRow[2], timezone: null,
+      label: `${cityRow[0]}, ${state}`,
+    };
+  }
+  function findCityRow(stateName, cityName){
+    const list = CITIES[stateName] || [];
+    return list.find(r => r[0] === cityName) || null;
+  }
 
-    function close(){ list.classList.add("hidden"); list.innerHTML=""; active=-1; }
-    function show(results){
-      items=results;
-      if(!results.length){ close(); return; }
-      list.innerHTML = results.map((p,i)=>`<li role="option" data-i="${i}" aria-selected="false"><span class="nm">${escapeHTML(p.name)}${p.admin1?`<span style="color:var(--muted-2)"> · ${escapeHTML(p.admin1)}</span>`:""}</span><span class="co">${escapeHTML(p.country||"")}</span></li>`).join("");
-      list.classList.remove("hidden");
-      list.querySelectorAll("li").forEach(li=>{
-        li.addEventListener("click",()=>{ const p=items[+li.dataset.i]; close(); choose(p); });
-      });
-    }
-    async function lookup(){
-      const q=input.value.trim(); if(q.length<2){ close(); return; }
-      try{ const r=await geocode(q); show(r); }catch(e){ close(); }
-    }
-    function choose(p){ input.value=placeLabel(p); p.label=placeLabel(p); onPick(p); }
+  function wirePicker(stateSelId, citySelId, onPick){
+    const stateSel = $(stateSelId), citySel = $(citySelId);
 
-    input.addEventListener("input",()=>{ clearTimeout(t); t=setTimeout(lookup,220); });
-    input.addEventListener("keydown",e=>{
-      if(list.classList.contains("hidden")){
-        if(e.key==="Enter"){ e.preventDefault(); doFirst(); }
+    // populate states once
+    const stateNames = Object.keys(CITIES).sort();
+    stateSel.innerHTML = `<option value="">Choose a state…</option>` +
+      stateNames.map(s => `<option value="${escapeHTML(s)}">${escapeHTML(s)}</option>`).join("");
+
+    function fillCities(stateName, keepCity){
+      const list = CITIES[stateName] || [];
+      if(!stateName || !list.length){
+        citySel.innerHTML = `<option value="">Choose a state first</option>`;
+        citySel.disabled = true;
         return;
       }
-      const lis=[...list.querySelectorAll("li")];
-      if(e.key==="ArrowDown"){ e.preventDefault(); active=Math.min(lis.length-1,active+1); }
-      else if(e.key==="ArrowUp"){ e.preventDefault(); active=Math.max(0,active-1); }
-      else if(e.key==="Enter"){ e.preventDefault(); if(active>=0){ choose(items[active]); close(); } else doFirst(); return; }
-      else if(e.key==="Escape"){ close(); return; }
-      else return;
-      lis.forEach((li,i)=>li.setAttribute("aria-selected", i===active?"true":"false"));
-    });
-    async function doFirst(){
-      const q=input.value.trim(); if(q.length<2) return;
-      loading("Locating "+q+"…");
-      try{ const r=await geocode(q); if(!r.length){ errorMsg(`No place found for "${q}". Try a different spelling or add a country.`); return; } const p=r[0]; choose(p); }
-      catch(e){ errorMsg("Could not reach the geocoder. Check your connection and try again."); }
-      close();
+      citySel.innerHTML = `<option value="">Choose a city…</option>` +
+        list.map(r => `<option value="${escapeHTML(r[0])}"${r[0]===keepCity?" selected":""}>${escapeHTML(r[0])}</option>`).join("");
+      citySel.disabled = false;
     }
-    btn.addEventListener("click",doFirst);
-    document.addEventListener("click",e=>{ if(!list.contains(e.target)&&e.target!==input) close(); });
-    return { setValue:(v)=>{input.value=v;} };
+
+    stateSel.addEventListener("change", () => { fillCities(stateSel.value); });
+    citySel.addEventListener("change", () => {
+      const row = findCityRow(stateSel.value, citySel.value);
+      if(row) onPick(makePlace(stateSel.value, row));
+    });
+
+    // programmatic selection (used on boot / restore)
+    return {
+      select(stateName, cityName, fire){
+        if(!CITIES[stateName]) return false;
+        stateSel.value = stateName;
+        fillCities(stateName, cityName);
+        if(cityName){
+          citySel.value = cityName;
+          const row = findCityRow(stateName, cityName);
+          if(row && fire) onPick(makePlace(stateName, row));
+          return !!row;
+        }
+        return true;
+      },
+      clear(){ stateSel.value=""; fillCities(""); },
+    };
   }
 
   // ============================================================
@@ -1117,8 +1125,8 @@
   // ============================================================
   //  Wire up controls
   // ============================================================
-  const searchA = wireSearch("cityInput","searchBtn","suggest", loadPrimary);
-  const searchB = wireSearch("cityInputB","searchBtnB","suggestB", loadCompare);
+  const pickerA = wirePicker("stateA","cityA", loadPrimary);
+  const pickerB = wirePicker("stateB","cityB", loadCompare);
 
   function setUnits(u){
     state.units=u;
@@ -1142,7 +1150,7 @@
     $("compareBtn").setAttribute("aria-pressed", state.compare);
     $("compareWrap").classList.toggle("hidden", !state.compare);
     $("compareBtn").textContent = state.compare ? "− Hide comparison" : "＋ Compare a city";
-    if(!state.compare){ state.B=null; state.placeB=null; }
+    if(!state.compare){ state.B=null; state.placeB=null; pickerB.clear(); }
     renderH2H();
     if(state.compare && state.A) renderLong(state.A, state.B);
     else if(state.A) renderLong(state.A, null);
@@ -1151,9 +1159,8 @@
   $("fileInput").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) handleFile(f); });
   $("clearUpload").addEventListener("click",()=>{
     state.uploaded=null; $("fileInput").value="";
-    const saved=store.get("almanac.city");
-    if(saved){ try{ const p=JSON.parse(saved); searchA.setValue(p.label||p.name); loadPrimary(p); }catch(_){ dash.classList.add("hidden"); } }
-    else { dash.classList.add("hidden"); setStatus("Back to live data. Search a city to begin."); }
+    if(state.placeA){ loadPrimary(state.placeA); }
+    else { dash.classList.add("hidden"); setStatus("Back to live data. Choose a state and city to begin."); }
   });
 
   // ============================================================
@@ -1164,11 +1171,16 @@
     const s=store.get("almanac.since"); if(s){ state.since=+s; $("sinceSel").value=s; }
     const saved=store.get("almanac.city");
     if(saved){
-      try{ const p=JSON.parse(saved); searchA.setValue(p.label||p.name); loadPrimary(p); return; }catch(_){}
+      try{
+        const p=JSON.parse(saved);
+        if(p.admin1 && p.name && CITIES[p.admin1] && findCityRow(p.admin1,p.name)){
+          pickerA.select(p.admin1, p.name, false);
+          loadPrimary(p); return;
+        }
+      }catch(_){}
     }
-    // First-run: load a sensible default so the page is alive on open
-    loadPrimary({name:"Phoenix", admin1:"Arizona", country:"United States", latitude:33.4484, longitude:-112.074, timezone:"America/Phoenix", label:"Phoenix, Arizona, United States"});
-    searchA.setValue("Phoenix, Arizona, United States");
+    // First-run default: Phoenix, Arizona
+    pickerA.select("Arizona","Phoenix", true);
   })();
 
 })();
